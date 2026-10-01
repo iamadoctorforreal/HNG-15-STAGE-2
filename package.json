@@ -1,0 +1,23 @@
+{
+  "name": "hng-15-stage-2-sawfy-white",
+  "version": "1.0.0",
+  "description": "Sawfy White Enterprises — Premium Dried Catfish E-Commerce Website",
+  "scripts": {
+    "dev": "npm --prefix sawfy-white run dev",
+    "build": "npm --prefix sawfy-white run build",
+    "start": "npm --prefix sawfy-white run start",
+    "test": "npm --prefix sawfy-white run test",
+    "lint": "npm --prefix sawfy-white run lint"
+  },
+  "keywords": [
+    "nextjs",
+    "supabase",
+    "paystack",
+    "flutterwave",
+    "mailgun",
+    "hng15",
+    "ecommerce"
+  ],
+  "author": "Sawfy White Enterprises",
+  "license": "MIT"
+}

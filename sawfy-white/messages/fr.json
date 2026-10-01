@@ -1,0 +1,32 @@
+{
+  "common": {
+    "brandName": "Sawfy White Enterprises",
+    "tagline": "Des eaux d'Abeokuta à votre table — poisson-chat séché de qualité exportation.",
+    "welcome": "Bienvenue !",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "logout": "Déconnexion",
+    "cart": "Panier",
+    "checkout": "Paiement",
+    "products": "Produits",
+    "blog": "Blog",
+    "about": "À propos",
+    "contact": "Contactez-nous",
+    "faq": "FAQ",
+    "account": "Mon Compte",
+    "orders": "Mes Commandes",
+    "search": "Rechercher",
+    "currency": "Devise",
+    "language": "Langue",
+    "addToCart": "Ajouter au Panier",
+    "removeFromCart": "Supprimer",
+    "continueShopping": "Continuer les Achats",
+    "proceedToCheckout": "Passer à la Caisse",
+    "viewDetails": "Voir Détails",
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "noResults": "Aucun résultat",
+    "backToHome": "Retour à l'accueil"
+  }
+}

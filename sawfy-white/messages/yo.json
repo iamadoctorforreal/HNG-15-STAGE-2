@@ -1,0 +1,32 @@
+{
+  "common": {
+    "brandName": "Sawfy White Enterprises",
+    "tagline": "Lati odo Abeokuta de tabili re — eja aro gbigbe to dara julo, ti e nikan.",
+    "welcome": "Ẹ kú àbọ̀!",
+    "login": "Wọle",
+    "signup": "Forukọsilẹ",
+    "logout": "Jade",
+    "cart": "Apo Ọja",
+    "checkout": "Sanwo",
+    "products": "Awọn Ọja",
+    "blog": "Bulọọgi",
+    "about": "Nipa Wa",
+    "contact": "Kan si Wa",
+    "faq": "Awọn Ibeere",
+    "account": "Akọọlẹ Mi",
+    "orders": "Awọn Aṣẹ Mi",
+    "search": "Ṣawari",
+    "currency": "Owo",
+    "language": "Ede",
+    "addToCart": "Fi si Apo",
+    "removeFromCart": "Yọ kuro",
+    "continueShopping": "Tẹsiwaju rira",
+    "proceedToCheckout": "Lọ si Isanwo",
+    "viewDetails": "Wo Awọn alaye",
+    "loading": "N gbe wọle...",
+    "error": "Nkankan ti ko tọ",
+    "retry": "Gbiyanju lẹẹkansi",
+    "noResults": "Ko si abajade",
+    "backToHome": "Pada si Ile"
+  }
+}
