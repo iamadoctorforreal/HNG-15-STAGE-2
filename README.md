@@ -49,8 +49,8 @@
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/getstuffsfrom/hng-15-stage-2.git
-cd hng-15-stage-2/sawfy-white
+git clone https://github.com/iamadoctorforreal/HNG-15-STAGE-2.git
+cd HNG-15-STAGE-2/sawfy-white
 ```
 
 ### 2. Configure Environment Variables
