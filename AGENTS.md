@@ -137,6 +137,8 @@ sawfy-white/
 ├── messages/
 │   ├── en.json                 # English translations
 │   ├── yo.json                 # Yoruba translations
+│   ├── ha.json                 # Hausa translations
+│   ├── ig.json                 # Igbo translations
 │   └── fr.json                 # French translations
 ├── i18n/
 │   ├── routing.ts              # Locale routing config

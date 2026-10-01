@@ -1,0 +1,32 @@
+{
+  "common": {
+    "brandName": "Sawfy White Enterprises",
+    "tagline": "Si n'ime mmiri Abeokuta ruo n'elu tebụl gị — azụ kpọrọ nkụ nke kacha mma, nke gị kpọmkwem.",
+    "welcome": "Nnọọ!",
+    "login": "Banye",
+    "signup": "Debanye aha",
+    "logout": "Pụọ",
+    "cart": "Ngwa Ahịa",
+    "checkout": "Kwụọ Ụgwọ",
+    "products": "Ngwa Ahịa",
+    "blog": "Blọọgụ",
+    "about": "Banyere Anyị",
+    "contact": "Kpọtụrụ Anyị",
+    "faq": "Ajụjụ",
+    "account": "Akaụntụ M",
+    "orders": "Iwu m nyere",
+    "search": "Chọọ",
+    "currency": "Ego",
+    "language": "Asụsụ",
+    "addToCart": "Tinye na ngwa",
+    "removeFromCart": "Wepụ",
+    "continueShopping": "Gaa n'ihu ịzụ ahịa",
+    "proceedToCheckout": "Gaa Kwụọ Ụgwọ",
+    "viewDetails": "Lee nkọwa",
+    "loading": "Na-ebu...",
+    "error": "Ihe adịghị mma merenụ",
+    "retry": "Nwaa ọzọ",
+    "noResults": "Enweghị nsonaazụ",
+    "backToHome": "Laghachi n'ụlọ"
+  }
+}

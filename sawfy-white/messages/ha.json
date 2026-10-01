@@ -1,0 +1,32 @@
+{
+  "common": {
+    "brandName": "Sawfy White Enterprises",
+    "tagline": "Daga ruwan Abeokuta zuwa teburinku — kifin bushewa ingantacce, na musamman a gare ku.",
+    "welcome": "Barka da zuwa!",
+    "login": "Shiga",
+    "signup": "Yi Rajista",
+    "logout": "Fita",
+    "cart": "Kwandon Saya",
+    "checkout": "Biya",
+    "products": "Kayayyaki",
+    "blog": "Blog",
+    "about": "Game da Mu",
+    "contact": "Tuntube Mu",
+    "faq": "Tambayoyi",
+    "account": "Asusuna",
+    "orders": "Oda na",
+    "search": "Bincika",
+    "currency": "Kuɗi",
+    "language": "Harshe",
+    "addToCart": "Saka cikin Kwando",
+    "removeFromCart": "Cire",
+    "continueShopping": "Ci gaba da sayayya",
+    "proceedToCheckout": "Zuwa Biya",
+    "viewDetails": "Duba Cikakkun Bayani",
+    "loading": "Ana lodi...",
+    "error": "Wani abu ya faru",
+    "retry": "Sake gwadawa",
+    "noResults": "Babu sakamako",
+    "backToHome": "Komawa Gida"
+  }
+}
