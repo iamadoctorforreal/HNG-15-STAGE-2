@@ -1,5 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wuqfacjwfkijewdqvous.supabase.co';
+const serviceRoleKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || 'dummy-key-for-test-environments';
+
 /**
  * Admin Supabase client with service role key.
  * Bypasses Row Level Security — use ONLY for:
@@ -9,7 +14,4 @@ import { createClient } from '@supabase/supabase-js';
  *
  * NEVER expose this client to the browser.
  */
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+export const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
