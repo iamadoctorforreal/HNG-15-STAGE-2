@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { PAYMENT_METHOD_OPTIONS, routePaymentMethod } from '@/lib/payments/routing';
 import { PaymentMethod, ShippingAddress } from '@/types';
+import { useCart } from '@/hooks/useCart';
 
 export interface CheckoutItem {
   productId: string;
@@ -21,28 +22,41 @@ export function CheckoutForm({
   initialItems?: CheckoutItem[];
   currency?: 'NGN' | 'USD';
 }) {
-  const [items] = useState<CheckoutItem[]>(
-    initialItems.length > 0
-      ? initialItems
-      : [
-          {
-            productId: 'prod-001',
-            title: 'Abeokuta Royal Dried Catfish (Jumbo Pack - 1kg)',
-            variantTitle: '1kg Pack (5-7 Giant Fish)',
-            unitPrice: 18500,
-            quantity: 1,
-            isDigital: false,
-          },
-          {
-            productId: 'prod-003',
-            title: 'Abeokuta Catfish Kitchen: Traditional Recipes (Cookbook)',
-            variantTitle: 'Deluxe Edition',
-            unitPrice: 2500,
-            quantity: 1,
-            isDigital: true,
-          },
-        ]
-  );
+  const { items: cartItems } = useCart();
+
+  const activeItems: CheckoutItem[] =
+    cartItems.length > 0
+      ? cartItems.map((c) => ({
+          productId: c.id,
+          variantId: c.variantId,
+          title: c.title,
+          variantTitle: c.variantTitle,
+          unitPrice: c.price,
+          quantity: c.quantity,
+          isDigital: c.is_digital,
+        }))
+      : initialItems.length > 0
+        ? initialItems
+        : [
+            {
+              productId: 'prod-001',
+              title: 'Abeokuta Royal Dried Catfish (Jumbo Pack - 1kg)',
+              variantTitle: '1kg Pack (5-7 Giant Fish)',
+              unitPrice: 18500,
+              quantity: 1,
+              isDigital: false,
+            },
+            {
+              productId: 'prod-003',
+              title: 'Abeokuta Catfish Kitchen: Traditional Recipes (Cookbook)',
+              variantTitle: 'Deluxe Edition',
+              unitPrice: 2500,
+              quantity: 1,
+              isDigital: true,
+            },
+          ];
+
+  const [items] = useState<CheckoutItem[]>(activeItems);
 
   const [address, setAddress] = useState<ShippingAddress>({
     firstName: '',

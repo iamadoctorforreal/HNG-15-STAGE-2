@@ -1,5 +1,7 @@
 import React from 'react';
 import { setRequestLocale } from 'next-intl/server';
+import { ProductCard } from '@/components/shop/ProductCard';
+import Image from 'next/image';
 
 export default async function HomePage({
   params,
@@ -9,169 +11,191 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return (
-    <div className="space-y-16 py-8">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#e6f5ed]/60 to-[#FAF8F5] py-16 sm:py-24">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#008751]/10 text-[#006b3f] text-xs font-semibold uppercase tracking-wider mb-6">
-            <span>🇳🇬</span> Direct From Abeokuta, Ogun State
-          </div>
-          <h1 className="text-4xl sm:text-6xl font-extrabold text-[#2D2D2D] tracking-tight font-serif max-w-4xl mx-auto leading-tight">
-            Premium Export-Grade <span className="text-[#008751]">Dried Catfish</span>
-          </h1>
-          <p className="mt-6 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto font-light leading-relaxed">
-            Naturally oven-smoked to golden perfection. Sand-grit free, rich in Omega-3 & pure protein. Exported directly to your doorstep in Nigeria, the UK, and the USA.
-          </p>
+  const featuredProducts = [
+    {
+      id: 'prod-001',
+      title: 'Abeokuta Royal Dried Catfish (1kg Pack)',
+      slug: 'abeokuta-royal-dried-catfish-1kg',
+      description:
+        '5-7 jumbo oven-smoked African catfish. Cleaned, gutted, sand-grit free, and sealed with 90-day export shelf life. Perfect for soup stews or diaspora travel packaging.',
+      base_price: 18500,
+      image: '/images/catfish-jumbo.jpg',
+      badge: 'Bestseller • Export Grade A',
+      badgeColor: 'emerald' as const,
+      is_digital: false,
+      variants: [
+        { id: 'var-1a', title: '1kg Standard Pack (5-7 Giant Fish)', price: 18500 },
+        { id: 'var-1b', title: '2kg Value Pack', price: 35000 },
+        { id: 'var-1c', title: 'Carton (10kg Wholesale / Export)', price: 170000 },
+      ],
+    },
+    {
+      id: 'prod-002',
+      title: 'Medium Dried Catfish (500g Stew & Soup Pack)',
+      slug: 'medium-dried-catfish-500g',
+      description:
+        'Pre-cut stew-sized smoked catfish pieces. The absolute standard for making authentic Yoruba soups: Efo Riro, Egusi, Ila Alasepo, and Pepper Soup.',
+      base_price: 9500,
+      image: '/images/catfish-medium.jpg',
+      badge: 'Popular for Soups',
+      badgeColor: 'amber' as const,
+      is_digital: false,
+      variants: [
+        { id: 'var-2a', title: '500g Stew Cut Pack', price: 9500 },
+        { id: 'var-2b', title: '1kg Twin Pack', price: 18000 },
+      ],
+    },
+    {
+      id: 'prod-003',
+      title: 'The Abeokuta Catfish Kitchen: 45 Authentic Recipes',
+      slug: 'abeokuta-catfish-cookbook-digital',
+      description:
+        'Official Sawfy White digital cookbook with 45 authentic heritage recipes, soup-pairing guides, cleaning secrets, and nutritional breakdowns. Instant PDF download upon purchase.',
+      base_price: 2500,
+      image: '/images/cookbook-cover.jpg',
+      badge: 'Digital Cookbook',
+      badgeColor: 'teal' as const,
+      is_digital: true,
+      variants: [
+        { id: 'var-3a', title: 'Deluxe PDF Edition', price: 2500 },
+      ],
+    },
+  ];
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href={`/${locale}/checkout`}
-              className="w-full sm:w-auto px-8 py-3.5 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all text-center"
-            >
-              Order Now • Instant Checkout
-            </a>
-            <a
-              href={`/${locale}/products`}
-              className="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-gray-50 text-gray-800 font-semibold rounded-lg border border-gray-200 transition-colors text-center"
-            >
-              Browse Products & Cookbook
-            </a>
+  return (
+    <div className="space-y-16 pb-16">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#e6f5ed] via-[#FAF8F5] to-white py-16 sm:py-24 border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-7 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#008751]/10 text-[#006b3f] text-xs font-bold uppercase tracking-wider mb-6">
+                <span>🇳🇬</span> Direct From Abeokuta, Ogun State
+              </div>
+              <h1 className="text-4xl sm:text-6xl font-black text-[#2D2D2D] tracking-tight font-serif leading-[1.1]">
+                Export-Grade <span className="text-[#008751]">Dried Catfish</span> From Abeokuta
+              </h1>
+              <p className="mt-6 text-base sm:text-lg text-gray-600 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
+                Thoroughly gutted, washed, and naturally hardwood-smoked to golden crisp perfection. 100% sand-free, rich in Omega-3, and sealed for safe shipping across Nigeria, the UK, and the USA.
+              </p>
+
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                <a
+                  href={`/${locale}/products`}
+                  className="w-full sm:w-auto px-8 py-3.5 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-center text-sm"
+                >
+                  Order Catfish Now • Fast Delivery
+                </a>
+                <a
+                  href={`/${locale}/checkout`}
+                  className="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-gray-50 text-gray-800 font-semibold rounded-xl border border-gray-300 transition-colors text-center text-sm"
+                >
+                  Instant Checkout →
+                </a>
+              </div>
+
+              {/* Key Trust Badges */}
+              <div className="mt-10 grid grid-cols-3 gap-4 pt-8 border-t border-gray-200 text-center lg:text-left">
+                <div>
+                  <span className="font-extrabold text-gray-900 block text-lg">100%</span>
+                  <span className="text-xs text-gray-500">Sand & Grit Free</span>
+                </div>
+                <div>
+                  <span className="font-extrabold text-gray-900 block text-lg">90 Days</span>
+                  <span className="text-xs text-gray-500">Export Shelf Life</span>
+                </div>
+                <div>
+                  <span className="font-extrabold text-gray-900 block text-lg">Global</span>
+                  <span className="text-xs text-gray-500">UK, US & Nigeria</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Hero Image Showcase */}
+            <div className="lg:col-span-5 relative">
+              <div className="relative h-80 sm:h-96 w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+                <Image
+                  src="/images/catfish-jumbo.jpg"
+                  alt="Abeokuta Royal Dried Catfish"
+                  fill
+                  priority
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
+                  <div className="text-white">
+                    <span className="bg-[#008751] text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                      Sawfy White Quality
+                    </span>
+                    <h3 className="font-bold text-lg mt-1 font-serif">
+                      Abeokuta Royal Dried Catfish
+                    </h3>
+                    <p className="text-xs text-gray-200">
+                      Oven-smoked with aromatic hardwoods in Abeokuta
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* Featured Products Grid */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#008751]">
-            Our Selection
-          </span>
-          <h2 className="text-3xl font-bold text-gray-900 font-serif mt-1">
-            Created by Sawfy White Enterprises
-          </h2>
-          <p className="text-sm text-gray-500 mt-2">
-            Hygienically packaged for long shelf-life and international shipping.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 pb-4 border-b border-gray-200">
+          <div>
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#008751]">
+              Freshly Smoked • Ready to Ship
+            </span>
+            <h2 className="text-3xl font-extrabold text-gray-900 font-serif mt-1">
+              Featured Products & Cookbook
+            </h2>
+          </div>
+          <a
+            href={`/${locale}/products`}
+            className="text-xs font-bold text-[#008751] hover:underline mt-2 sm:mt-0"
+          >
+            View Full Catalogue →
+          </a>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Card 1 */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-md transition-shadow flex flex-col">
-            <div className="h-48 bg-gradient-to-br from-emerald-100 to-amber-50 flex items-center justify-center text-6xl">
-              🐟
-            </div>
-            <div className="p-6 flex-1 flex flex-col">
-              <span className="text-[11px] font-bold text-[#008751] uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded w-max">
-                Bestseller • 1kg Pack
-              </span>
-              <h3 className="font-bold text-lg text-gray-900 mt-2">
-                Abeokuta Royal Dried Catfish (1kg)
-              </h3>
-              <p className="text-xs text-gray-600 mt-2 flex-1">
-                5-7 jumbo catfish, thoroughly gutted, sand-free, and oven-smoked to retain rich natural oils and hearty flavor.
-              </p>
-              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                <span className="font-bold text-lg text-gray-900">₦18,500</span>
-                <a
-                  href={`/${locale}/checkout`}
-                  className="px-4 py-2 bg-[#008751] hover:bg-[#006b3f] text-white text-xs font-semibold rounded-md transition-colors"
-                >
-                  Buy Now
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-md transition-shadow flex flex-col">
-            <div className="h-48 bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center text-6xl">
-              🍲
-            </div>
-            <div className="p-6 flex-1 flex flex-col">
-              <span className="text-[11px] font-bold text-orange-700 uppercase tracking-wider bg-orange-50 px-2 py-0.5 rounded w-max">
-                Stew & Soup Pack • 500g
-              </span>
-              <h3 className="font-bold text-lg text-gray-900 mt-2">
-                Medium Dried Catfish (500g)
-              </h3>
-              <p className="text-xs text-gray-600 mt-2 flex-1">
-                Ideal for family soups: Efo Riro, Egusi, Obe Ata, and Pepper Soup. Tender skin and smoky aroma.
-              </p>
-              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                <span className="font-bold text-lg text-gray-900">₦9,500</span>
-                <a
-                  href={`/${locale}/checkout`}
-                  className="px-4 py-2 bg-[#008751] hover:bg-[#006b3f] text-white text-xs font-semibold rounded-md transition-colors"
-                >
-                  Buy Now
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3 */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-md transition-shadow flex flex-col">
-            <div className="h-48 bg-gradient-to-br from-teal-50 to-emerald-100 flex items-center justify-center text-6xl">
-              📖
-            </div>
-            <div className="p-6 flex-1 flex flex-col">
-              <span className="text-[11px] font-bold text-teal-800 uppercase tracking-wider bg-teal-50 px-2 py-0.5 rounded w-max">
-                Digital Cookbook • Instant PDF
-              </span>
-              <h3 className="font-bold text-lg text-gray-900 mt-2">
-                The Abeokuta Catfish Kitchen
-              </h3>
-              <p className="text-xs text-gray-600 mt-2 flex-1">
-                45 authentic Nigerian recipes featuring dried catfish. From Abeokuta heritage soups to modern diaspora dishes.
-              </p>
-              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                <span className="font-bold text-lg text-gray-900">₦2,500</span>
-                <a
-                  href={`/${locale}/checkout`}
-                  className="px-4 py-2 bg-[#008751] hover:bg-[#006b3f] text-white text-xs font-semibold rounded-md transition-colors"
-                >
-                  Get Cookbook
-                </a>
-              </div>
-            </div>
-          </div>
+          {featuredProducts.map((prod) => (
+            <ProductCard key={prod.id} {...prod} />
+          ))}
         </div>
       </section>
 
-      {/* Cultural Pride & Abeokuta Connection */}
+      {/* Cultural Heritage & Olumo Rock Story */}
       <section className="bg-white py-16 border-y border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-6 relative h-80 rounded-2xl overflow-hidden shadow-md">
+            <Image
+              src="/images/catfish-stew_pack.jpg"
+              alt="Abeokuta Traditional Catfish Stew Ingredients"
+              fill
+              className="object-cover"
+            />
+          </div>
+
+          <div className="lg:col-span-6">
             <span className="text-xs font-bold text-[#008751] uppercase tracking-wider">
-              Heritage & Authenticity
+              Abeokuta Heritage & Authenticity
             </span>
             <h2 className="text-3xl font-bold text-gray-900 font-serif mt-2 leading-tight">
               Rooted in the Ancient City Under the Rock
             </h2>
             <p className="mt-4 text-sm text-gray-600 leading-relaxed">
-              In Abeokuta, food is not merely sustenance; it is culture, royalty, and community. At Sawfy White Enterprises, our catfish is farmed in freshwater ponds and smoked with select hardwoods according to time-honored Egba methods, updated with strict modern food safety standards.
+              In Abeokuta, catfish is not just food — it is heritage, royalty, and warm hospitality. At Sawfy White Enterprises, our catfish is farmed in pure freshwater, seasoned, and slowly smoked to bring you that unforgettable deep, savory aroma that elevates any soup from simple to extraordinary.
             </p>
-            <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
-              <div className="p-3 bg-warm-gray-50 rounded-lg">
-                <span className="font-bold text-gray-900 block">68% Dry Protein</span>
-                <span className="text-xs text-gray-500">Laboratory verified nutrient density</span>
-              </div>
-              <div className="p-3 bg-warm-gray-50 rounded-lg">
-                <span className="font-bold text-gray-900 block">90-Day Shelf Life</span>
-                <span className="text-xs text-gray-500">Vacuum export packaging</span>
-              </div>
+            <div className="mt-6 p-4 rounded-xl bg-[#FAF8F5] border border-emerald-100">
+              <p className="font-serif italic text-gray-800 text-sm">
+                "Bí o kò bá le wà ní Olúmọ, ẹja wa yóò mú ilé wá sí tabili rẹ."
+              </p>
+              <p className="text-[11px] text-gray-500 mt-1">
+                (Even if you are in London or Texas, our catfish brings Abeokuta home to your table.)
+              </p>
             </div>
-          </div>
-
-          <div className="bg-gradient-to-tr from-[#008751]/10 to-amber-100/30 p-8 rounded-2xl border border-emerald-100 text-center">
-            <span className="text-5xl block mb-4">🪨</span>
-            <blockquote className="font-serif italic text-gray-700 text-base">
-              "Bí o kò bá le wà ní Olúmọ, ẹja wa yóò mú ilé wá sí tabili rẹ."
-            </blockquote>
-            <p className="text-xs text-gray-500 mt-2">
-              (If you cannot stand at Olumo Rock today, our catfish brings home directly to your table.)
-            </p>
           </div>
         </div>
       </section>
