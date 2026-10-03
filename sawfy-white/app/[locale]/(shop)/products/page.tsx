@@ -50,6 +50,7 @@ export default async function ProductsPage({
             is_digital={p.is_digital}
             variants={p.variants}
             weightInfo={p.weightInfo}
+            locale={locale}
           />
         ))}
       </div>

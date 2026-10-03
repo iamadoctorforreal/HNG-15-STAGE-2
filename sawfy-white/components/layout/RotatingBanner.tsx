@@ -54,7 +54,7 @@ export function RotatingBanner() {
         {/* Subtle Water Stream Indicator */}
         <div className="hidden sm:flex items-center gap-1.5 opacity-75 text-[11px] text-[#E8C468]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#E8C468] animate-pulse" />
-          <span className="font-semibold uppercase tracking-wider">Abeokuta River Sourced</span>
+          <span className="font-semibold uppercase tracking-wider">Abeokuta Fish Farms • Farm-Raised</span>
         </div>
 
         {/* Dynamic Rotating Message */}
