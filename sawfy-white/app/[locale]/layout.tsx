@@ -5,13 +5,16 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { CartProvider } from '@/hooks/useCart';
 import { Navbar } from '@/components/layout/Navbar';
+import { RotatingBanner } from '@/components/layout/RotatingBanner';
+import { RotatingProverb } from '@/components/layout/RotatingProverb';
+import { BrandLogo } from '@/components/ui/BrandLogo';
 import { CartDrawer } from '@/components/shop/CartDrawer';
 import '../globals.css';
 
 export const metadata: Metadata = {
   title: 'Sawfy White Enterprises — Export-Grade Abeokuta Dried Catfish',
   description:
-    'Naturally oven-dried, export-grade African catfish sourced and processed in Abeokuta, Ogun State, Nigeria. Delivering to Nigeria, UK, US, and worldwide.',
+    'Hygienic, 100% sand-free export-grade dried catfish sourced and prepared in Abeokuta, Ogun State, Nigeria. Worldwide shipping to Nigeria, UK, US, and beyond.',
 };
 
 export function generateStaticParams() {
@@ -38,10 +41,8 @@ export default async function LocaleLayout({
     <html lang={locale} className="scroll-smooth">
       <body className="min-h-screen bg-[#FAF8F5] text-[#2D2D2D] antialiased flex flex-col font-sans">
         <CartProvider>
-          {/* Top Cultural Announcement Bar */}
-          <div className="bg-[#005230] text-emerald-100 text-xs py-2 px-4 text-center font-medium border-b border-emerald-800">
-            <span>Ẹ kú àbọ̀!</span> Naturally oven-smoked export-grade catfish from Abeokuta • Worldwide shipping to Nigeria, UK & US 🇳🇬 ✈️
-          </div>
+          {/* Top Multilingual Rotating Cultural Banner */}
+          <RotatingBanner />
 
           {/* Dynamic Navbar */}
           <Navbar locale={locale} />
@@ -55,32 +56,30 @@ export default async function LocaleLayout({
           </NextIntlClientProvider>
 
           {/* Cultural Footer */}
-          <footer className="bg-[#2D2D2D] text-white py-12 border-t-4 border-[#008751]">
+          <footer className="bg-[#1f2923] text-white py-14 border-t-4 border-[#008751]">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-4 gap-8 text-center sm:text-left">
               <div className="md:col-span-2">
-                <div className="flex items-center gap-2 justify-center sm:justify-start mb-3">
-                  <span className="text-2xl">🐟</span>
-                  <h3 className="font-extrabold text-xl text-emerald-400 font-serif">
-                    Sawfy White Enterprises
-                  </h3>
+                <div className="flex items-center gap-2 justify-center sm:justify-start mb-4">
+                  <BrandLogo size="md" light={true} />
                 </div>
                 <p className="text-xs text-gray-300 leading-relaxed max-w-sm">
-                  Export-grade dried catfish farm-raised and smoked in the historic city of Abeokuta, Ogun State, Nigeria. Sourced with honor, delivered fresh to homes across Nigeria and diaspora communities in the UK and US.
+                  Export-grade dried catfish sourced with pride in the historic city of Abeokuta, Ogun State, Nigeria. 100% sand-grit free, hygienically dried, and securely sealed for homes across Nigeria and diaspora communities in the UK and US.
                 </p>
-                <div className="mt-4 flex gap-3 text-xs text-amber-300">
-                  <span>★ Export Grade A</span>
-                  <span>• Sand-Free</span>
-                  <span>• 90-Day Shelf Life</span>
+                <div className="mt-4 flex flex-wrap gap-2 text-xs text-[#E8C468]">
+                  <span className="px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-800">★ Export Grade A</span>
+                  <span className="px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-800">• 100% Sand-Free</span>
+                  <span className="px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-800">• Long Shelf Life</span>
                 </div>
               </div>
 
               <div className="text-xs text-gray-300 space-y-2">
                 <h4 className="font-bold text-white uppercase tracking-wider mb-3 text-sm">
-                  Navigation
+                  Explore
                 </h4>
                 <p><a href={`/${locale}`} className="hover:text-emerald-400 transition-colors">Home</a></p>
-                <p><a href={`/${locale}/products`} className="hover:text-emerald-400 transition-colors">Our Products</a></p>
-                <p><a href={`/${locale}/checkout`} className="hover:text-emerald-400 transition-colors">Checkout</a></p>
+                <p><a href={`/${locale}/products`} className="hover:text-emerald-400 transition-colors">Dried Catfish Catalog</a></p>
+                <p><a href={`/${locale}/blog`} className="hover:text-emerald-400 transition-colors">Culinary Blog</a></p>
+                <p><a href={`/${locale}/checkout`} className="hover:text-emerald-400 transition-colors">Secure Checkout</a></p>
                 <p><a href={`/${locale}/login`} className="hover:text-emerald-400 transition-colors">My Account & Orders</a></p>
               </div>
 
@@ -89,17 +88,17 @@ export default async function LocaleLayout({
                   Abeokuta Roots
                 </h4>
                 <p>📍 Abeokuta, Ogun State, Nigeria</p>
-                <p>📧 orders@sawfywhite.com</p>
+                <p>📧 orders@fish.sawfywhite.com</p>
                 <p>📞 WhatsApp: +234 801 234 5678</p>
-                <div className="pt-2 text-emerald-400 font-bold">
-                  Bí o kò bá le wà ní Olúmọ, ẹja wa yóò mú ilé wá sí tabili rẹ.
-                </div>
+                
+                {/* Rotating Multilingual Cultural Proverb */}
+                <RotatingProverb />
               </div>
             </div>
 
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-10 pt-6 border-t border-gray-700 text-center text-xs text-gray-400 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-10 pt-6 border-t border-gray-800 text-center text-xs text-gray-400 flex flex-col sm:flex-row items-center justify-between gap-4">
               <span>© {new Date().getFullYear()} Sawfy White Enterprises. All rights reserved.</span>
-              <span className="text-emerald-400">Proudly rooted in Abeokuta, Nigeria 🇳🇬</span>
+              <span className="text-emerald-400 font-medium">Rooted in Abeokuta, Sourced with Heritage 🇳🇬</span>
             </div>
           </footer>
         </CartProvider>

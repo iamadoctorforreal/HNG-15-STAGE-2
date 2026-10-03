@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useCart } from '@/hooks/useCart';
+import { BrandLogo } from '@/components/ui/BrandLogo';
 
 export function Navbar({ locale = 'en' }: { locale?: string }) {
   const { totalItems, openCart } = useCart();
@@ -9,19 +10,9 @@ export function Navbar({ locale = 'en' }: { locale?: string }) {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-2xs">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
-        {/* Brand Logo */}
-        <a href={`/${locale}`} className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#008751] to-emerald-400 flex items-center justify-center text-xl shadow-xs group-hover:scale-105 transition-transform">
-            🐟
-          </div>
-          <div>
-            <span className="font-extrabold text-xl text-[#006b3f] tracking-tight block leading-none font-serif">
-              Sawfy White
-            </span>
-            <span className="text-[10px] uppercase tracking-widest text-[#D4A843] font-bold block mt-0.5">
-              Enterprises • Abeokuta
-            </span>
-          </div>
+        {/* Brand Logo with Abstract Golden Leaping Catfish Crest */}
+        <a href={`/${locale}`} className="group transition-opacity hover:opacity-95">
+          <BrandLogo size="md" />
         </a>
 
         {/* Links & Interactive Cart */}
@@ -31,6 +22,12 @@ export function Navbar({ locale = 'en' }: { locale?: string }) {
             className="hover:text-[#008751] transition-colors hidden sm:inline"
           >
             Products
+          </a>
+          <a
+            href={`/${locale}/blog`}
+            className="hover:text-[#008751] transition-colors hidden md:inline text-xs"
+          >
+            Blog
           </a>
           <a
             href={`/${locale}/login`}
