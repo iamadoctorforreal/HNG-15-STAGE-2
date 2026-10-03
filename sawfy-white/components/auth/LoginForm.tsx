@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { BrandLogo } from '@/components/ui/BrandLogo';
 
 export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
   const [email, setEmail] = useState('');
@@ -65,8 +66,8 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
 
   return (
     <div className="max-w-md w-full mx-auto bg-white p-8 rounded-2xl border border-gray-200 shadow-md">
-      <div className="text-center mb-6">
-        <span className="text-4xl block mb-2">🐟</span>
+      <div className="text-center mb-6 flex flex-col items-center">
+        <BrandLogo size="sm" showText={false} className="mb-2" />
         <h2 className="text-2xl font-bold font-serif text-gray-900">
           {mode === 'signup' ? 'Join Sawfy White Family' : 'Welcome Back'}
         </h2>
