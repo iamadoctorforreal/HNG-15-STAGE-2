@@ -5,72 +5,102 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 export function RiverAmbience() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [volume, setVolume] = useState(0.5);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const audioNodesRef = useRef<{ source: AudioNode; gain: GainNode } | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
   const mousePosRef = useRef<{ x: number; y: number; active: boolean }>({ x: 0, y: 0, active: false });
 
-  // Web Audio Waterfall Generator
+  // High-Fidelity Multi-Layered Waterfall & Splashing Stream Audio Engine
   const toggleAudio = useCallback(() => {
-    if (isPlayingAudio) {
-      if (audioContextRef.current) {
-        audioContextRef.current.suspend();
-      }
-      setIsPlayingAudio(false);
-    } else {
-      try {
-        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-        if (!audioContextRef.current) {
-          const ctx = new AudioCtx();
-          audioContextRef.current = ctx;
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
 
-          // Generate authentic rushing waterfall sound (pink/brown noise with cascading filter)
-          const bufferSize = ctx.sampleRate * 4;
-          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-          const data = buffer.getChannelData(0);
-          let b0 = 0, b1 = 0, b2 = 0;
-          for (let i = 0; i < bufferSize; i++) {
-            const white = Math.random() * 2 - 1;
-            b0 = 0.99 * b0 + white * 0.05;
-            b1 = 0.95 * b1 + white * 0.1;
-            b2 = 0.85 * b2 + white * 0.25;
-            data[i] = (b0 + b1 + b2) * 0.6;
-          }
+      if (!audioContextRef.current) {
+        const ctx = new AudioCtx();
+        audioContextRef.current = ctx;
 
-          const noise = ctx.createBufferSource();
-          noise.buffer = buffer;
-          noise.loop = true;
+        // Master Gain
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(volume, ctx.currentTime);
+        masterGain.connect(ctx.destination);
+        gainNodeRef.current = masterGain;
 
-          // Dual Filter for realistic waterfall roar & stream splash
-          const filter = ctx.createBiquadFilter();
-          filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(600, ctx.currentTime);
-          filter.Q.setValueAtTime(1.5, ctx.currentTime);
-
-          const highPass = ctx.createBiquadFilter();
-          highPass.type = 'highpass';
-          highPass.frequency.setValueAtTime(80, ctx.currentTime);
-
-          const gain = ctx.createGain();
-          gain.gain.setValueAtTime(0.12, ctx.currentTime); // calming, audible ambient volume
-
-          noise.connect(highPass);
-          highPass.connect(filter);
-          filter.connect(gain);
-          gain.connect(ctx.destination);
-
-          noise.start(0);
-          audioNodesRef.current = { source: noise, gain };
-        } else {
-          audioContextRef.current.resume();
+        // Layer 1: Deep Waterfall Cascade (Continuous Brown Noise Stream)
+        const bufferSize = ctx.sampleRate * 3;
+        const waterfallBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = waterfallBuffer.getChannelData(0);
+        let lastOut = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          lastOut = (lastOut + 0.03 * white) / 1.03;
+          data[i] = lastOut * 3.5;
         }
-        setIsPlayingAudio(true);
-      } catch (e) {
-        console.error('Waterfall audio failed to start:', e);
-      }
-    }
-  }, [isPlayingAudio]);
 
-  // Canvas Waterfall, Flowing Stream & Interactive Leaping Catfish
+        const waterfallSource = ctx.createBufferSource();
+        waterfallSource.buffer = waterfallBuffer;
+        waterfallSource.loop = true;
+
+        // Resonant cascade bandpass filter for rushing waterfall roar
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, ctx.currentTime);
+        filter.Q.setValueAtTime(1.8, ctx.currentTime);
+
+        const cascadeGain = ctx.createGain();
+        cascadeGain.gain.setValueAtTime(0.4, ctx.currentTime);
+
+        waterfallSource.connect(filter);
+        filter.connect(cascadeGain);
+        cascadeGain.connect(masterGain);
+        waterfallSource.start(0);
+
+        // Layer 2: Sparkling Water Splash Ripples (High-frequency foam & bubbles)
+        const foamBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const foamData = foamBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          foamData[i] = (Math.random() * 2 - 1) * 0.15;
+        }
+        const foamSource = ctx.createBufferSource();
+        foamSource.buffer = foamBuffer;
+        foamSource.loop = true;
+
+        const foamFilter = ctx.createBiquadFilter();
+        foamFilter.type = 'bandpass';
+        foamFilter.frequency.setValueAtTime(2400, ctx.currentTime);
+        foamFilter.Q.setValueAtTime(2.5, ctx.currentTime);
+
+        const foamGain = ctx.createGain();
+        foamGain.gain.setValueAtTime(0.2, ctx.currentTime);
+
+        foamSource.connect(foamFilter);
+        foamFilter.connect(foamGain);
+        foamGain.connect(masterGain);
+        foamSource.start(0);
+
+        setIsPlayingAudio(true);
+      } else {
+        if (audioContextRef.current.state === 'suspended' || !isPlayingAudio) {
+          audioContextRef.current.resume();
+          setIsPlayingAudio(true);
+        } else {
+          audioContextRef.current.suspend();
+          setIsPlayingAudio(false);
+        }
+      }
+    } catch (e) {
+      console.error('Audio initialization error:', e);
+    }
+  }, [isPlayingAudio, volume]);
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setVolume(val);
+    if (gainNodeRef.current && audioContextRef.current) {
+      gainNodeRef.current.gain.setValueAtTime(val, audioContextRef.current.currentTime);
+    }
+  };
+
+  // Canvas Waterfall, Stream & Leaping Catfish Animation
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -88,18 +118,15 @@ export function RiverAmbience() {
     };
     window.addEventListener('resize', handleResize);
 
-    // Mouse movement tracker for interactive fish flashing
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
-      mousePosRef.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-        active: true,
-      };
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      mousePosRef.current = { x, y, active: true };
 
-      // Spontaneous interactive fish spawn on hover!
-      if (Math.random() > 0.7 && activeFishes.length < 5) {
-        spawnFishAt(e.clientX - rect.left, e.clientY - rect.top);
+      // Interactive fish leap triggered near mouse cursor!
+      if (Math.random() > 0.72 && activeFishes.length < 4) {
+        spawnFishAt(x, y);
       }
     };
     const handleMouseLeave = () => {
@@ -109,7 +136,7 @@ export function RiverAmbience() {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
 
-    // Waterfall cascade droplets falling from top
+    // Waterfall curtain droplets falling from top
     interface WaterDrop {
       x: number;
       y: number;
@@ -118,16 +145,16 @@ export function RiverAmbience() {
       alpha: number;
       width: number;
     }
-    const waterDrops: WaterDrop[] = Array.from({ length: 90 }, () => ({
+    const waterDrops: WaterDrop[] = Array.from({ length: 110 }, () => ({
       x: Math.random() * width,
-      y: Math.random() * height * 0.45,
-      speed: Math.random() * 6 + 5,
-      length: Math.random() * 25 + 15,
-      alpha: Math.random() * 0.4 + 0.15,
-      width: Math.random() * 2 + 1,
+      y: Math.random() * height * 0.5,
+      speed: Math.random() * 8 + 6,
+      length: Math.random() * 28 + 18,
+      alpha: Math.random() * 0.5 + 0.2,
+      width: Math.random() * 2.2 + 1,
     }));
 
-    // Floating foam and river mist particles
+    // River mist particles
     interface FoamParticle {
       x: number;
       y: number;
@@ -136,16 +163,16 @@ export function RiverAmbience() {
       size: number;
       alpha: number;
     }
-    const foamParticles: FoamParticle[] = Array.from({ length: 45 }, () => ({
+    const foamParticles: FoamParticle[] = Array.from({ length: 50 }, () => ({
       x: Math.random() * width,
       y: height * 0.35 + Math.random() * (height * 0.65),
-      vx: (Math.random() - 0.5) * 1.2 + 0.8, // downstream drift
+      vx: (Math.random() - 0.5) * 1.4 + 0.9,
       vy: (Math.random() - 0.5) * 0.4,
       size: Math.random() * 3 + 1.5,
       alpha: Math.random() * 0.5 + 0.2,
     }));
 
-    // Interactive Swimming & Leaping Catfish (with authentic whiskers, dorsal fins)
+    // Leaping Catfish (Authentic whiskers and dark-golden body)
     interface Catfish {
       x: number;
       y: number;
@@ -155,8 +182,7 @@ export function RiverAmbience() {
       duration: number;
       peakHeight: number;
       distance: number;
-      direction: number; // 1 for right, -1 for left
-      isLeaping: boolean;
+      direction: number;
       scale: number;
     }
 
@@ -168,17 +194,15 @@ export function RiverAmbience() {
         x: targetX,
         y: targetY,
         startX: targetX - direction * 60,
-        startY: Math.max(targetY, height * 0.4),
+        startY: Math.max(targetY, height * 0.45),
         t: 0,
-        duration: 90 + Math.floor(Math.random() * 40),
-        peakHeight: 70 + Math.random() * 50,
-        distance: 160 + Math.random() * 100,
+        duration: 85 + Math.floor(Math.random() * 35),
+        peakHeight: 75 + Math.random() * 55,
+        distance: 180 + Math.random() * 90,
         direction,
-        isLeaping: true,
         scale: 0.9 + Math.random() * 0.4,
       });
 
-      // Trigger ripple
       waterRipples.push({
         x: targetX,
         y: targetY,
@@ -187,7 +211,6 @@ export function RiverAmbience() {
       });
     };
 
-    // Splash ripples
     interface Ripple {
       x: number;
       y: number;
@@ -197,24 +220,22 @@ export function RiverAmbience() {
     const waterRipples: Ripple[] = [];
 
     let waveTick = 0;
-    let autoFishCountdown = 80;
+    let autoFishCountdown = 60;
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
       waveTick += 0.025;
 
-      // 1. RUSHING WATERFALL CURTAIN FROM TOP
-      // Cascading streams coming down from the top edge
+      // 1. Cascading Waterfall Curtains
       for (let i = 0; i < 4; i++) {
         ctx.beginPath();
-        const startX = 0;
-        const streamHeight = height * (0.35 + i * 0.08);
-        ctx.moveTo(startX, 0);
+        const streamHeight = height * (0.32 + i * 0.08);
+        ctx.moveTo(0, 0);
 
         for (let x = 0; x <= width; x += 25) {
           const cascadeY =
             streamHeight +
-            Math.sin(x * 0.02 + waveTick * 2 + i) * 16 +
+            Math.sin(x * 0.02 + waveTick * 2.2 + i) * 16 +
             Math.cos(x * 0.04 - waveTick * 1.5) * 8;
           ctx.lineTo(x, cascadeY);
         }
@@ -226,32 +247,31 @@ export function RiverAmbience() {
         const waterGrad = ctx.createLinearGradient(0, 0, 0, height);
         if (i === 0) {
           waterGrad.addColorStop(0, 'rgba(0, 135, 81, 0.08)');
-          waterGrad.addColorStop(0.4, 'rgba(0, 107, 63, 0.15)');
-          waterGrad.addColorStop(1, 'rgba(0, 82, 48, 0.22)');
+          waterGrad.addColorStop(0.4, 'rgba(0, 107, 63, 0.16)');
+          waterGrad.addColorStop(1, 'rgba(0, 82, 48, 0.24)');
         } else if (i === 1) {
           waterGrad.addColorStop(0, 'rgba(232, 196, 104, 0.06)');
-          waterGrad.addColorStop(0.5, 'rgba(0, 135, 81, 0.18)');
-          waterGrad.addColorStop(1, 'rgba(0, 50, 30, 0.28)');
+          waterGrad.addColorStop(0.5, 'rgba(0, 135, 81, 0.2)');
+          waterGrad.addColorStop(1, 'rgba(0, 50, 30, 0.3)');
         } else {
-          waterGrad.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
-          waterGrad.addColorStop(0.3, 'rgba(179, 224, 201, 0.18)');
-          waterGrad.addColorStop(1, 'rgba(0, 107, 63, 0.32)');
+          waterGrad.addColorStop(0, 'rgba(255, 255, 255, 0.18)');
+          waterGrad.addColorStop(0.3, 'rgba(179, 224, 201, 0.22)');
+          waterGrad.addColorStop(1, 'rgba(0, 107, 63, 0.35)');
         }
         ctx.fillStyle = waterGrad;
         ctx.fill();
       }
 
-      // 2. FALLING WATER DROPLETS (Rushing Waterfall Effect)
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      // 2. Falling Waterfall Water Droplets
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
       waterDrops.forEach((d) => {
         d.y += d.speed;
-        if (d.y > height * 0.55) {
-          // Splash into river pool
+        if (d.y > height * 0.6) {
           waterRipples.push({
             x: d.x,
             y: d.y,
             radius: 2,
-            alpha: 0.4,
+            alpha: 0.45,
           });
           d.y = 0;
           d.x = Math.random() * width;
@@ -264,7 +284,7 @@ export function RiverAmbience() {
         ctx.stroke();
       });
 
-      // 3. DRIFTING RIVER MIST & FOAM
+      // 3. Drifting Mist & Bubbles
       foamParticles.forEach((f) => {
         f.x += f.vx;
         f.y += f.vy;
@@ -279,11 +299,11 @@ export function RiverAmbience() {
         ctx.fill();
       });
 
-      // 4. WATER RIPPLES ON WATER SURFACE
+      // 4. Water Ripples
       for (let i = waterRipples.length - 1; i >= 0; i--) {
         const r = waterRipples[i];
-        r.radius += 1.6;
-        r.alpha -= 0.018;
+        r.radius += 1.8;
+        r.alpha -= 0.02;
         if (r.alpha <= 0) {
           waterRipples.splice(i, 1);
           continue;
@@ -295,80 +315,71 @@ export function RiverAmbience() {
         ctx.stroke();
       }
 
-      // 5. AUTONOMOUS & INTERACTIVE LEAPING CATFISH
+      // 5. Fish Spawn & Leap
       autoFishCountdown--;
       if (autoFishCountdown <= 0 && activeFishes.length < 3) {
         const randX = Math.random() * (width * 0.7) + width * 0.15;
         const randY = height * 0.65 + Math.random() * 60;
         spawnFishAt(randX, randY);
-        autoFishCountdown = 160 + Math.floor(Math.random() * 120);
+        autoFishCountdown = 140 + Math.floor(Math.random() * 100);
       }
 
-      // Render each active catfish in realistic leaping arc
       for (let i = activeFishes.length - 1; i >= 0; i--) {
         const fish = activeFishes[i];
         fish.t += 1 / fish.duration;
 
         if (fish.t >= 1) {
-          // Splash re-entry
           waterRipples.push({
             x: fish.x,
             y: fish.startY,
-            radius: 8,
+            radius: 9,
             alpha: 0.9,
           });
           activeFishes.splice(i, 1);
           continue;
         }
 
-        // Parabolic Leap: y = startY - 4 * peak * t * (1 - t)
         const prog = fish.t;
         fish.x = fish.startX + fish.direction * fish.distance * prog;
         const arcY = 4 * fish.peakHeight * prog * (1 - prog);
         fish.y = fish.startY - arcY;
 
-        // Angle of flight
         const tangent = 4 * fish.peakHeight * (1 - 2 * prog);
         const rotation = Math.atan2(-tangent, fish.direction * fish.distance);
 
-        // Draw authentic African catfish with distinctive head, whiskers, sleek body
         ctx.save();
         ctx.translate(fish.x, fish.y);
         ctx.rotate(rotation);
         ctx.scale(fish.scale, fish.scale);
 
-        // Golden & emerald glowing aura
         ctx.shadowColor = '#E8C468';
         ctx.shadowBlur = 14;
 
-        // Catfish Body (Dark ebony top, golden bronze belly, sleek scaleless Clarias profile)
+        // Catfish Profile
         ctx.beginPath();
-        ctx.moveTo(24 * fish.direction, 0); // Flat snout / mouth
-        ctx.quadraticCurveTo(12 * fish.direction, -9, -10 * fish.direction, -6); // Broad dorsal back
-        ctx.quadraticCurveTo(-20 * fish.direction, -3, -28 * fish.direction, -8); // Tail fin upper lobe
-        ctx.lineTo(-24 * fish.direction, 0); // Tail fork
-        ctx.lineTo(-28 * fish.direction, 8); // Tail fin lower lobe
-        ctx.quadraticCurveTo(-20 * fish.direction, 4, -10 * fish.direction, 6); // Belly
-        ctx.quadraticCurveTo(12 * fish.direction, 9, 24 * fish.direction, 0); // Head
+        ctx.moveTo(24 * fish.direction, 0);
+        ctx.quadraticCurveTo(12 * fish.direction, -9, -10 * fish.direction, -6);
+        ctx.quadraticCurveTo(-20 * fish.direction, -3, -28 * fish.direction, -8);
+        ctx.lineTo(-24 * fish.direction, 0);
+        ctx.lineTo(-28 * fish.direction, 8);
+        ctx.quadraticCurveTo(-20 * fish.direction, 4, -10 * fish.direction, 6);
+        ctx.quadraticCurveTo(12 * fish.direction, 9, 24 * fish.direction, 0);
         ctx.closePath();
 
         const fishGrad = ctx.createLinearGradient(-28, -6, 24, 6);
-        fishGrad.addColorStop(0, '#1c1b18'); // Dark ebony tail
-        fishGrad.addColorStop(0.4, '#B8922E'); // Rich ochre gold body
-        fishGrad.addColorStop(0.8, '#E8C468'); // Golden sheen
-        fishGrad.addColorStop(1, '#FFF8E7'); // Radiant head
+        fishGrad.addColorStop(0, '#1c1b18');
+        fishGrad.addColorStop(0.4, '#B8922E');
+        fishGrad.addColorStop(0.8, '#E8C468');
+        fishGrad.addColorStop(1, '#FFF8E7');
         ctx.fillStyle = fishGrad;
         ctx.fill();
 
-        // Characteristic Catfish Barbels (Long Whisker Filaments)
+        // Barbels / Whiskers
         ctx.beginPath();
-        // Upper barbels
         ctx.moveTo(20 * fish.direction, -2);
         ctx.quadraticCurveTo(12 * fish.direction, -12, -4 * fish.direction, -10);
-        // Lower barbels
         ctx.moveTo(20 * fish.direction, 3);
         ctx.quadraticCurveTo(12 * fish.direction, 14, -4 * fish.direction, 12);
-        // Chin barbels
         ctx.moveTo(16 * fish.direction, 5);
         ctx.quadraticCurveTo(8 * fish.direction, 16, 0, 14);
         ctx.strokeStyle = '#FFF8E7';
@@ -376,23 +387,12 @@ export function RiverAmbience() {
         ctx.lineCap = 'round';
         ctx.stroke();
 
-        // Eye of the Catfish
         ctx.beginPath();
         ctx.arc(16 * fish.direction, -3, 2, 0, Math.PI * 2);
         ctx.fillStyle = '#FFF8E7';
         ctx.fill();
 
         ctx.restore();
-
-        // Droplet spray in flight
-        if (Math.random() > 0.4) {
-          waterRipples.push({
-            x: fish.x - fish.direction * 12,
-            y: fish.y + 6,
-            radius: 2,
-            alpha: 0.6,
-          });
-        }
       }
 
       animId = requestAnimationFrame(render);
@@ -410,40 +410,58 @@ export function RiverAmbience() {
 
   return (
     <>
-      {/* Full Waterfall & River Ambient Layer */}
+      {/* Waterfall & River Canvas Layer */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         <canvas ref={canvasRef} className="w-full h-full opacity-85" />
       </div>
 
-      {/* Prominent Waterfall Sound Controller Banner */}
-      <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-2">
-        <button
-          onClick={toggleAudio}
-          className={`w-full sm:w-auto px-5 py-2.5 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-3 backdrop-blur-md shadow-md border transition-all cursor-pointer ${
-            isPlayingAudio
-              ? 'bg-[#008751] text-white border-emerald-400 ring-4 ring-emerald-300/40 shadow-emerald-900/30'
-              : 'bg-white/95 hover:bg-white text-gray-800 border-emerald-200 hover:border-emerald-400'
-          }`}
-          title="Click to hear the soothing sound of Abeokuta farm waterfall and swimming catfish"
-        >
-          <span className="text-base">{isPlayingAudio ? '🌊' : '🔊'}</span>
-          <span>
-            {isPlayingAudio
-              ? 'Abeokuta Farm Waterfall & Stream (Playing Sound)'
-              : 'Click to Hear the Abeokuta Farm Waterfall & Water Flow'}
-          </span>
-          {isPlayingAudio ? (
-            <span className="flex gap-1 items-end h-3.5">
-              <span className="w-1 h-2 bg-white animate-pulse" />
-              <span className="w-1 h-3.5 bg-white animate-pulse delay-75" />
-              <span className="w-1 h-2.5 bg-white animate-pulse delay-150" />
+      {/* Prominent Floating Audio Player & Equalizer */}
+      <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-3 pb-2">
+        <div className="bg-white/95 backdrop-blur-md p-3 rounded-2xl border-2 border-[#D4A843] shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleAudio}
+              className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 shadow-md transition-all cursor-pointer ${
+                isPlayingAudio
+                  ? 'bg-[#008751] text-white ring-4 ring-emerald-300'
+                  : 'bg-amber-500 hover:bg-amber-600 text-white animate-bounce'
+              }`}
+            >
+              <span className="text-base">{isPlayingAudio ? '🔊' : '▶'}</span>
+              <span>
+                {isPlayingAudio
+                  ? 'Playing Waterfall & Stream Sound'
+                  : 'TAP HERE: Play Waterfall & Stream Sound'}
+              </span>
+            </button>
+
+            {isPlayingAudio && (
+              <div className="flex items-end gap-1 h-5 px-2">
+                <span className="w-1 bg-[#008751] animate-pulse h-3" />
+                <span className="w-1 bg-[#008751] animate-pulse delay-75 h-5" />
+                <span className="w-1 bg-[#008751] animate-pulse delay-150 h-2" />
+                <span className="w-1 bg-[#008751] animate-pulse delay-100 h-4" />
+              </div>
+            )}
+          </div>
+
+          {/* Volume Control */}
+          <div className="flex items-center gap-2 text-xs font-bold text-gray-700">
+            <span>Volume:</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={volume}
+              onChange={handleVolumeChange}
+              className="w-24 accent-[#008751] cursor-pointer"
+            />
+            <span className="text-[10px] text-gray-400">
+              {Math.round(volume * 100)}%
             </span>
-          ) : (
-            <span className="text-[10px] bg-emerald-100 text-[#006b3f] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">
-              Audio
-            </span>
-          )}
-        </button>
+          </div>
+        </div>
       </div>
     </>
   );

@@ -35,6 +35,12 @@ export function Navbar({ locale = 'en' }: { locale?: string }) {
           >
             Sign In
           </a>
+          <a
+            href={`/${locale}/admin`}
+            className="hover:text-[#008751] transition-colors hidden lg:inline text-xs text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200"
+          >
+            Admin
+          </a>
 
           {/* Cart Button with live counter badge */}
           <button
