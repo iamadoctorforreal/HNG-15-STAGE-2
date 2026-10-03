@@ -6,6 +6,8 @@ const mailgun = new Mailgun(formData);
 export const mg = mailgun.client({
   username: 'api',
   key: process.env.MAILGUN_API_KEY || 'key-dummy-for-build',
+  // US accounts use https://api.mailgun.net, EU-region domains use https://api.eu.mailgun.net
+  url: process.env.MAILGUN_API_URL || 'https://api.mailgun.net',
 });
 
 export async function sendOrderConfirmationEmail({
