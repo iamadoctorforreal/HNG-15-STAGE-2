@@ -3,7 +3,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { RiverAmbience } from '@/components/motion/RiverAmbience';
 import { LeadMagnetModal } from '@/components/shop/LeadMagnetModal';
-import { FALLBACK_PRODUCTS } from '@/app/api/products/route';
+import { FALLBACK_PRODUCTS } from '@/lib/constants';
 import Image from 'next/image';
 
 export default async function HomePage({

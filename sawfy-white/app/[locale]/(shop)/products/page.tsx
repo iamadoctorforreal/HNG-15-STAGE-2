@@ -1,7 +1,7 @@
 import React from 'react';
 import { setRequestLocale } from 'next-intl/server';
 import { ProductCard } from '@/components/shop/ProductCard';
-import { FALLBACK_PRODUCTS } from '@/app/api/products/route';
+import { FALLBACK_PRODUCTS } from '@/lib/constants';
 
 export const metadata = {
   title: 'Dried Catfish Products & Digital Library — Sawfy White Enterprises',
