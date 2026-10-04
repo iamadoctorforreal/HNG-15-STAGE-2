@@ -7,6 +7,8 @@ import { BrandLogo } from '@/components/ui/BrandLogo';
 export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
@@ -20,7 +22,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${origin}/api/auth/callback`,
+          redirectTo: `${origin}/api/auth/callback?next=/en`,
         },
       });
       if (error) throw error;
@@ -37,25 +39,39 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
 
     try {
       if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
+        // Use our server-side auto-confirm registration endpoint with Mailgun
+        const regRes = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, firstName, lastName }),
+        });
+
+        const regData = await regRes.json();
+        if (!regRes.ok) {
+          throw new Error(regData.error || 'Registration failed');
+        }
+
+        // Auto sign-in immediately so user is NEVER left on a blank page!
+        const { error: signInErr } = await supabase.auth.signInWithPassword({
           email,
           password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/api/auth/callback`,
-          },
         });
-        if (error) throw error;
-        setMessage({
-          text: 'Account created! Please check your email for verification link.',
-          type: 'success',
-        });
+
+        if (signInErr) {
+          setMessage({
+            text: 'Account created! Please sign in with your password below.',
+            type: 'success',
+          });
+        } else {
+          window.location.href = '/en';
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        window.location.href = '/';
+        window.location.href = '/en';
       }
     } catch (err: any) {
       setMessage({ text: err?.message || 'Authentication failed', type: 'error' });
@@ -65,22 +81,22 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
   };
 
   return (
-    <div className="max-w-md w-full mx-auto bg-white p-8 rounded-2xl border border-gray-200 shadow-md">
+    <div className="max-w-md w-full mx-auto bg-white p-8 rounded-3xl border border-gray-200 shadow-lg">
       <div className="text-center mb-6 flex flex-col items-center">
-        <BrandLogo size="sm" showText={false} className="mb-2" />
-        <h2 className="text-2xl font-bold font-serif text-gray-900">
-          {mode === 'signup' ? 'Join Sawfy White Family' : 'Welcome Back'}
+        <BrandLogo size="md" showText={false} className="mb-2" />
+        <h2 className="text-2xl font-black font-serif text-gray-900">
+          {mode === 'signup' ? 'Create Your Account' : 'Welcome Back'}
         </h2>
         <p className="text-xs text-gray-500 mt-1">
           {mode === 'signup'
-            ? 'Create an account to track your dried catfish orders'
-            : 'Sign in to access your orders and cookbook downloads'}
+            ? 'Join Sawfy White to track dried catfish shipments & save orders'
+            : 'Sign in to access your orders and cookbook library'}
         </p>
       </div>
 
       {message && (
         <div
-          className={`mb-4 p-3 rounded-lg text-xs font-semibold ${
+          className={`mb-4 p-3.5 rounded-xl text-xs font-semibold ${
             message.type === 'success'
               ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
               : 'bg-red-50 text-red-700 border border-red-200'
@@ -94,7 +110,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
       <button
         onClick={handleGoogleSignIn}
         disabled={loading}
-        className="w-full py-3 px-4 border border-gray-300 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition-colors shadow-2xs font-semibold text-sm text-gray-700 disabled:opacity-50"
+        className="w-full py-3.5 px-4 border border-gray-300 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition-colors shadow-2xs font-bold text-xs text-gray-800 disabled:opacity-50 cursor-pointer"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path
@@ -122,35 +138,65 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
           <div className="w-full border-t border-gray-200" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="px-2 bg-white text-gray-400">or with email</span>
+          <span className="px-3 bg-white text-gray-400 font-medium">or continue with email</span>
         </div>
       </div>
 
       <form onSubmit={handleEmailAuth} className="space-y-4">
+        {mode === 'signup' && (
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">
+                First Name
+              </label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] focus:outline-none"
+                placeholder="e.g. Babatunde"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">
+                Last Name
+              </label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] focus:outline-none"
+                placeholder="e.g. Adeleke"
+              />
+            </div>
+          </div>
+        )}
+
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">
-            Email Address
+          <label className="block text-xs font-bold text-gray-700 mb-1">
+            Email Address *
           </label>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#008751]"
-            placeholder="you@example.com"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] focus:outline-none"
+            placeholder="name@example.com"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">
-            Password
+          <label className="block text-xs font-bold text-gray-700 mb-1">
+            Password (at least 6 characters) *
           </label>
           <input
             type="password"
             required
+            minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#008751]"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] focus:outline-none"
             placeholder="••••••••"
           />
         </div>
@@ -158,9 +204,9 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-lg text-sm shadow-md transition-colors disabled:opacity-50"
+          className="w-full py-3.5 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-xl text-xs shadow-md transition-all disabled:opacity-50 cursor-pointer"
         >
-          {loading ? 'Processing...' : mode === 'signup' ? 'Create Account' : 'Sign In'}
+          {loading ? 'Processing...' : mode === 'signup' ? 'Create Account & Sign In →' : 'Sign In →'}
         </button>
       </form>
 
@@ -168,15 +214,15 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
         {mode === 'signup' ? (
           <p>
             Already have an account?{' '}
-            <a href="/login" className="text-[#008751] font-bold hover:underline">
+            <a href="/en/login" className="text-[#008751] font-bold hover:underline">
               Sign In
             </a>
           </p>
         ) : (
           <p>
             Don't have an account?{' '}
-            <a href="/signup" className="text-[#008751] font-bold hover:underline">
-              Sign Up
+            <a href="/en/signup" className="text-[#008751] font-bold hover:underline">
+              Create an Account
             </a>
           </p>
         )}

@@ -7,7 +7,7 @@ export const mg = mailgun.client({
   username: 'api',
   key: process.env.MAILGUN_API_KEY || 'key-dummy-for-build',
   // US accounts use https://api.mailgun.net, EU-region domains use https://api.eu.mailgun.net
-  url: process.env.MAILGUN_API_URL || 'https://api.mailgun.net',
+  url: process.env.MAILGUN_API_URL || 'https://api.eu.mailgun.net',
 });
 
 export async function sendOrderConfirmationEmail({
@@ -28,7 +28,7 @@ export async function sendOrderConfirmationEmail({
     return null;
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://shop.sawfywhite.com';
   const downloadSection = downloadToken
     ? `<div style="background:#e6f5ed;padding:16px;border-radius:8px;margin:20px 0;border-left:4px solid #008751;">
         <h3 style="color:#005230;margin-top:0;">Your Digital Abeokuta Catfish Cookbook</h3>
@@ -48,7 +48,7 @@ export async function sendOrderConfirmationEmail({
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:12px;">
         <div style="text-align:center;border-bottom:2px solid #008751;padding-bottom:16px;margin-bottom:24px;">
           <h1 style="color:#008751;margin:0;font-size:24px;">Sawfy White Enterprises</h1>
-          <p style="color:#666;margin:4px 0 0 0;">Premium Export-Grade Dried Catfish from Abeokuta 🐟</p>
+          <p style="color:#666;margin:4px 0 0 0;">Premium Export-Grade Dried Catfish from Abeokuta</p>
         </div>
         <h2 style="color:#2D2D2D;">Ẹ kú oríire! Thank you for your order, ${customerName}!</h2>
         <p style="color:#555;font-size:16px;line-height:1.5;">
@@ -62,7 +62,96 @@ export async function sendOrderConfirmationEmail({
         ${downloadSection}
         <div style="border-top:1px solid #eee;padding-top:16px;margin-top:24px;font-size:13px;color:#888;text-align:center;">
           <p>Sawfy White Enterprises • Abeokuta, Ogun State, Nigeria 🇳🇬</p>
-          <p>Questions? Contact us anytime at support@sawfywhite.com</p>
+          <p>Questions? Contact us anytime at orders@fish.sawfywhite.com</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+// Welcome Email on Registration
+export async function sendWelcomeRegistrationEmail({
+  to,
+  name,
+}: {
+  to: string;
+  name?: string;
+}) {
+  if (!process.env.MAILGUN_API_KEY || !process.env.MAILGUN_DOMAIN) return null;
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://shop.sawfywhite.com';
+  const displayName = name || 'Valued Customer';
+
+  return await mg.messages.create(process.env.MAILGUN_DOMAIN, {
+    from:
+      process.env.MAILGUN_FROM_EMAIL ||
+      `Sawfy White Enterprises <orders@${process.env.MAILGUN_DOMAIN}>`,
+    to: [to],
+    subject: `Ẹ kú àbọ̀! Welcome to Sawfy White Enterprises 🐟`,
+    text: `Hello ${displayName},\n\nWelcome to Sawfy White Enterprises! Your customer account is now active.\n\nYou can track orders, download cookbooks, and enjoy priority dispatch for farm-raised Abeokuta dried catfish.\n\nVisit your account: ${siteUrl}/en/account\n\n— Sawfy White Enterprises, Abeokuta`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:12px;background:#ffffff;">
+        <div style="text-align:center;border-bottom:2px solid #008751;padding-bottom:16px;margin-bottom:24px;">
+          <h1 style="color:#008751;margin:0;font-size:24px;">Sawfy White Enterprises</h1>
+          <p style="color:#666;margin:4px 0 0 0;">Farm-Raised Export Dried Catfish • Abeokuta, Nigeria</p>
+        </div>
+        <h2 style="color:#2D2D2D;">Ẹ kú àbọ̀, ${displayName}!</h2>
+        <p style="color:#555;font-size:15px;line-height:1.6;">
+          Your customer account with <strong>Sawfy White Enterprises</strong> is now active. You have full access to our catalog, expedited domestic and diaspora checkout, and order delivery tracking.
+        </p>
+        <div style="text-align:center;margin:30px 0;">
+          <a href="${siteUrl}/en/products" style="background:#008751;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block;">
+            Explore Dried Catfish Catalog →
+          </a>
+        </div>
+        <div style="border-top:1px solid #eee;padding-top:16px;font-size:12px;color:#888;text-align:center;">
+          <p>Sawfy White Enterprises • Abeokuta, Ogun State, Nigeria 🇳🇬</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+// Lead Magnet eBook Delivery Email
+export async function sendLeadMagnetEmail({
+  to,
+  name,
+}: {
+  to: string;
+  name?: string;
+}) {
+  if (!process.env.MAILGUN_API_KEY || !process.env.MAILGUN_DOMAIN) return null;
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://shop.sawfywhite.com';
+  const displayName = name || 'Friend';
+
+  return await mg.messages.create(process.env.MAILGUN_DOMAIN, {
+    from:
+      process.env.MAILGUN_FROM_EMAIL ||
+      `Sawfy White Enterprises <orders@${process.env.MAILGUN_DOMAIN}>`,
+    to: [to],
+    subject: `Your Free Guide: The 7 Hidden Health Benefits of Dried Catfish 📖`,
+    text: `Hello ${displayName},\n\nHere is your free copy of 'The 7 Hidden Health Benefits of Dried Catfish'!\n\nRead or download your guide: ${siteUrl}/api/download/lead-magnet\n\n— Sawfy White Enterprises, Abeokuta`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:12px;background:#ffffff;">
+        <div style="text-align:center;border-bottom:2px solid #008751;padding-bottom:16px;margin-bottom:24px;">
+          <h1 style="color:#008751;margin:0;font-size:24px;">Sawfy White Enterprises</h1>
+          <p style="color:#666;margin:4px 0 0 0;">Abeokuta Fish Farms • Nutrition & Heritage</p>
+        </div>
+        <h2 style="color:#2D2D2D;">Here is your free guide, ${displayName}!</h2>
+        <p style="color:#555;font-size:15px;line-height:1.6;">
+          Thank you for requesting <em>The 7 Hidden Health Benefits of Dried Catfish</em>. Inside, you will discover the unique protein density, heart-healthy Omega-3 profile, and traditional culinary secrets of Abeokuta farm-raised dried catfish.
+        </p>
+        <div style="text-align:center;margin:30px 0;">
+          <a href="${siteUrl}/api/download/lead-magnet" style="background:#008751;color:#ffffff;padding:14px 28px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block;box-shadow:0 4px 12px rgba(0,135,81,0.25);">
+            📖 Read &amp; Download Free Guide (PDF) →
+          </a>
+        </div>
+        <p style="color:#666;font-size:13px;text-align:center;">
+          Ready to cook? <a href="${siteUrl}/en/products" style="color:#008751;font-weight:bold;">Order export-grade dried catfish now</a>.
+        </p>
+        <div style="border-top:1px solid #eee;padding-top:16px;font-size:12px;color:#888;text-align:center;">
+          <p>Sawfy White Enterprises • Abeokuta, Ogun State, Nigeria 🇳🇬</p>
         </div>
       </div>
     `,
