@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { sendWelcomeRegistrationEmail } from '@/lib/mailgun';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,8 +40,23 @@ export async function GET(request: Request) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && data?.user) {
+      // If newly registered user (created within the last 2 minutes), dispatch Mailgun welcome email
+      if (data.user.email) {
+        const createdAt = new Date(data.user.created_at).getTime();
+        const isNewUser = Date.now() - createdAt < 120000;
+        if (isNewUser) {
+          try {
+            await sendWelcomeRegistrationEmail({
+              to: data.user.email,
+              name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || '',
+            });
+          } catch (mailErr) {
+            console.warn('OAuth welcome email delivery error:', mailErr);
+          }
+        }
+      }
       return response;
     }
     console.error('exchangeCodeForSession error:', error);
