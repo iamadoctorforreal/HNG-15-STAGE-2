@@ -157,3 +157,55 @@ export async function sendLeadMagnetEmail({
     `,
   });
 }
+
+// Account Verification Email with Secure Link
+export async function sendVerificationEmail({
+  to,
+  name,
+  verificationUrl,
+}: {
+  to: string;
+  name?: string;
+  verificationUrl: string;
+}) {
+  if (!process.env.MAILGUN_API_KEY || !process.env.MAILGUN_DOMAIN) return null;
+
+  const displayName = name || 'Customer';
+
+  return await mg.messages.create(process.env.MAILGUN_DOMAIN, {
+    from:
+      process.env.MAILGUN_FROM_EMAIL ||
+      `Sawfy White Enterprises <orders@${process.env.MAILGUN_DOMAIN}>`,
+    to: [to],
+    subject: `Confirm Your Email — Sawfy White Enterprises 🐟`,
+    text: `Hello ${displayName},\n\nPlease confirm your email address to activate your Sawfy White Enterprises account.\n\nClick the link below to verify:\n${verificationUrl}\n\nThis verification link will expire in 24 hours.\n\n— Sawfy White Enterprises, Abeokuta`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:12px;background:#ffffff;">
+        <div style="text-align:center;border-bottom:2px solid #008751;padding-bottom:16px;margin-bottom:24px;">
+          <h1 style="color:#008751;margin:0;font-size:24px;">Sawfy White Enterprises</h1>
+          <p style="color:#666;margin:4px 0 0 0;">Abeokuta Fish Farms • Dried Catfish</p>
+        </div>
+        <h2 style="color:#2D2D2D;">Ẹ kú àbọ̀, ${displayName}!</h2>
+        <p style="color:#555;font-size:15px;line-height:1.6;">
+          Thank you for creating an account with <strong>Sawfy White Enterprises</strong>. Please verify your email address to activate your customer profile and access your orders.
+        </p>
+        <div style="text-align:center;margin:32px 0;">
+          <a href="${verificationUrl}" style="background:#008751;color:#ffffff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;box-shadow:0 4px 12px rgba(0,135,81,0.25);">
+            Verify &amp; Activate Account →
+          </a>
+        </div>
+        <p style="color:#777;font-size:13px;line-height:1.5;">
+          If the button above does not work, copy and paste this secure link into your browser:<br/>
+          <a href="${verificationUrl}" style="color:#008751;word-break:break-all;">${verificationUrl}</a>
+        </p>
+        <p style="color:#999;font-size:12px;margin-top:20px;">
+          This link will expire in 24 hours. If you did not create an account, you can safely ignore this email.
+        </p>
+        <div style="border-top:1px solid #eee;padding-top:16px;margin-top:24px;font-size:12px;color:#888;text-align:center;">
+          <p>Sawfy White Enterprises • Abeokuta, Ogun State, Nigeria 🇳🇬</p>
+        </div>
+      </div>
+    `,
+  });
+}
+

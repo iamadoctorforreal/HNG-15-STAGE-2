@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { sendWelcomeRegistrationEmail } from '@/lib/mailgun';
+import { sendVerificationEmail } from '@/lib/mailgun';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,21 +22,34 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. Create user with auto-confirmed email using Admin client
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      (req.headers.get('x-forwarded-host')
+        ? `https://${req.headers.get('x-forwarded-host')}`
+        : new URL(req.url).origin);
+
+    const fullName = `${firstName || ''} ${lastName || ''}`.trim() || email.split('@')[0];
+
+    // 1. Generate secure signup verification link in Supabase
+    const { data, error } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'signup',
       email,
       password,
-      email_confirm: true, // Instantly confirmed so user can log in without getting stuck!
-      user_metadata: {
-        first_name: firstName || '',
-        last_name: lastName || '',
-        full_name: `${firstName || ''} ${lastName || ''}`.trim(),
+      options: {
+        data: {
+          first_name: firstName || '',
+          last_name: lastName || '',
+          full_name: fullName,
+        },
+        redirectTo: `${siteUrl}/api/auth/callback?next=/en/account`,
       },
     });
 
     if (error) {
-      // If user already exists, let them know clearly
-      if (error.message.includes('already been registered') || error.message.includes('already exists')) {
+      if (
+        error.message.includes('already been registered') ||
+        error.message.includes('already exists')
+      ) {
         return NextResponse.json(
           { error: 'This email is already registered. Please sign in instead.' },
           { status: 400 }
@@ -45,30 +58,41 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    // 2. Insert into profiles table
+    // 2. Build the secure branded verification link
+    const tokenHash = data?.properties?.hashed_token;
+    const actionLink = data?.properties?.action_link;
+    const verificationUrl = tokenHash
+      ? `${siteUrl}/api/auth/callback?token_hash=${tokenHash}&type=signup&next=/en/account`
+      : actionLink;
+
+    // 3. Upsert into profiles table
     if (data.user) {
       await supabaseAdmin.from('profiles').upsert({
         id: data.user.id,
         email: data.user.email,
-        full_name: `${firstName || ''} ${lastName || ''}`.trim(),
+        full_name: fullName,
         role: 'customer',
       });
     }
 
-    // 3. Dispatch official branded welcome email via Mailgun
-    try {
-      await sendWelcomeRegistrationEmail({
-        to: email,
-        name: firstName || email.split('@')[0],
-      });
-    } catch (mailErr) {
-      console.warn('Welcome email dispatch warning:', mailErr);
+    // 4. Dispatch the verification link email directly via Mailgun!
+    if (verificationUrl) {
+      try {
+        await sendVerificationEmail({
+          to: email,
+          name: firstName || fullName,
+          verificationUrl,
+        });
+      } catch (mailErr) {
+        console.warn('Mailgun verification email dispatch error:', mailErr);
+      }
     }
 
     return NextResponse.json({
       success: true,
-      user: data.user,
-      message: 'Account successfully registered and confirmed!',
+      requiresVerification: true,
+      email,
+      message: 'Account created! Please check your email inbox to verify and activate your account.',
     });
   } catch (err: any) {
     return NextResponse.json(

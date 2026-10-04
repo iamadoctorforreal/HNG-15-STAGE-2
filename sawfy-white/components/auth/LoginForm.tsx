@@ -10,6 +10,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const supabase = createClient();
@@ -39,7 +40,6 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
 
     try {
       if (mode === 'signup') {
-        // Use our server-side auto-confirm registration endpoint with Mailgun
         const regRes = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -51,26 +51,25 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
           throw new Error(regData.error || 'Registration failed');
         }
 
-        // Auto sign-in immediately so user is NEVER left on a blank page!
-        const { error: signInErr } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (signInErr) {
-          setMessage({
-            text: 'Account created! Please sign in with your password below.',
-            type: 'success',
-          });
-        } else {
-          window.location.href = '/en';
+        if (regData.requiresVerification) {
+          setVerificationSent(true);
+          return;
         }
+
+        window.location.href = '/en';
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
+        if (error) {
+          if (error.message.toLowerCase().includes('email not confirmed')) {
+            throw new Error(
+              'Your email is not verified yet. Please check your inbox for the activation link we sent you.'
+            );
+          }
+          throw error;
+        }
         window.location.href = '/en';
       }
     } catch (err: any) {
@@ -79,6 +78,41 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
       setLoading(false);
     }
   };
+
+  if (verificationSent) {
+    return (
+      <div className="max-w-md w-full mx-auto bg-white p-8 rounded-3xl border-2 border-[#008751]/20 shadow-xl text-center">
+        <BrandLogo size="md" showText={false} className="mb-4 mx-auto" />
+        <div className="w-16 h-16 rounded-full bg-emerald-100 text-[#008751] text-3xl flex items-center justify-center mx-auto mb-4">
+          ✉️
+        </div>
+        <h2 className="text-2xl font-black font-serif text-gray-900">
+          Check Your Email
+        </h2>
+        <p className="text-xs text-gray-600 mt-3 leading-relaxed">
+          We have sent a secure activation link to <strong className="text-gray-900">{email}</strong>.
+        </p>
+        <p className="text-[11px] text-gray-500 mt-2 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed">
+          Please check your inbox (or spam/promotions folder) and click <strong>&ldquo;Verify &amp; Activate Account&rdquo;</strong> to complete your registration.
+        </p>
+
+        <div className="mt-6 flex flex-col gap-2.5">
+          <a
+            href="/en/login"
+            className="w-full py-3.5 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-xl text-xs shadow-md transition-all text-center"
+          >
+            Go to Sign In →
+          </a>
+          <button
+            onClick={() => setVerificationSent(false)}
+            className="text-xs text-gray-500 hover:text-gray-800 font-semibold cursor-pointer py-1"
+          >
+            ← Back to edit email or try again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md w-full mx-auto bg-white p-8 rounded-3xl border border-gray-200 shadow-lg">
