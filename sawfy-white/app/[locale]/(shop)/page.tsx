@@ -22,78 +22,80 @@ export default async function HomePage({
       <WaterfallBackground />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-14 sm:py-20 border-b border-emerald-900/10 backdrop-blur-xs">
+      <section className="relative overflow-hidden py-8 sm:py-14">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-7 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#008751]/10 text-[#006b3f] text-xs font-bold uppercase tracking-wider mb-6 border border-[#008751]/20">
-                <span>🌾</span> Farm-Raised in Abeokuta Fish Farms • Export-Grade
-              </div>
-              <h1 className="text-4xl sm:text-6xl font-black text-[#2D2D2D] tracking-tight font-serif leading-[1.1]">
-                Export-Grade <span className="text-[#008751]">Dried Catfish</span> From Abeokuta
-              </h1>
-              <p className="mt-6 text-base sm:text-lg text-gray-700 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
-                Farm-raised in clean Abeokuta aquaculture ponds, meticulously gutted, thoroughly washed, and hygienically dried to golden-brown crisp perfection. 100% sand-grit free, rich in Omega-3, and sealed for safe shipping across Nigeria, the UK, and the USA.
-              </p>
-
-              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <a
-                  href={`/${locale}/products`}
-                  className="w-full sm:w-auto px-8 py-3.5 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-center text-sm"
-                >
-                  Browse 10 Selections • Fast Dispatch
-                </a>
-                <a
-                  href={`/${locale}/checkout`}
-                  className="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-gray-50 text-gray-800 font-semibold rounded-xl border border-gray-300 transition-colors text-center text-sm shadow-xs"
-                >
-                  Instant Checkout →
-                </a>
-              </div>
-
-              {/* Key Trust Badges */}
-              <div className="mt-10 grid grid-cols-3 gap-4 pt-8 border-t border-gray-200 text-center lg:text-left">
-                <div>
-                  <span className="font-extrabold text-[#005230] block text-xl">100%</span>
-                  <span className="text-xs text-gray-600 font-medium">Sand & Grit Free</span>
+          <div className="bg-white/88 backdrop-blur-md p-6 sm:p-10 rounded-3xl shadow-2xl border border-white/60">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              <div className="lg:col-span-7 text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#008751]/10 text-[#006b3f] text-xs font-bold uppercase tracking-wider mb-6 border border-[#008751]/20">
+                  <span>🌾</span> Farm-Raised in Abeokuta Fish Farms • Export-Grade
                 </div>
-                <div>
-                  <span className="font-extrabold text-[#005230] block text-xl">90 Days</span>
-                  <span className="text-xs text-gray-600 font-medium">Export Shelf Life</span>
-                </div>
-                <div>
-                  <span className="font-extrabold text-[#005230] block text-xl">Global</span>
-                  <span className="text-xs text-gray-600 font-medium">UK, US & Nigeria</span>
-                </div>
-              </div>
-            </div>
+                <h1 className="text-4xl sm:text-6xl font-black text-[#2D2D2D] tracking-tight font-serif leading-[1.1]">
+                  Export-Grade <span className="text-[#008751]">Dried Catfish</span> From Abeokuta
+                </h1>
+                <p className="mt-6 text-base sm:text-lg text-gray-700 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
+                  Farm-raised in clean Abeokuta aquaculture ponds, meticulously gutted, thoroughly washed, and hygienically dried to golden-brown crisp perfection. 100% sand-grit free, rich in Omega-3, and sealed for safe shipping across Nigeria, the UK, and the USA.
+                </p>
 
-            {/* Hero Image Showcase - Real Authentic Round-Curled Dried Catfish */}
-            <div className="lg:col-span-5 relative">
-              <a href={`/${locale}/products/whole-round-curled-dried-catfish-big`} className="block group">
-                <div className="relative h-80 sm:h-96 w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white transition-transform group-hover:scale-102">
-                  <Image
-                    src="/images/catfish-real-glass-plate.png"
-                    alt="Authentic Nigerian Round-Curled Dried Catfish on Plate"
-                    fill
-                    priority
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-6">
-                    <div className="text-white">
-                      <span className="bg-[#008751] text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                        ★ Signature Eja Kika (Round Curled)
-                      </span>
-                      <h3 className="font-bold text-lg mt-1 font-serif group-hover:text-emerald-300 transition-colors">
-                        Abeokuta Royal Dried Catfish
-                      </h3>
-                      <p className="text-xs text-emerald-100">
-                        Farm-raised in Abeokuta fish farms &bull; Click to view details
-                      </p>
-                    </div>
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                  <a
+                    href={`/${locale}/products`}
+                    className="w-full sm:w-auto px-8 py-3.5 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-center text-sm"
+                  >
+                    Browse 10 Selections • Fast Dispatch
+                  </a>
+                  <a
+                    href={`/${locale}/checkout`}
+                    className="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-gray-50 text-gray-800 font-semibold rounded-xl border border-gray-300 transition-colors text-center text-sm shadow-xs"
+                  >
+                    Instant Checkout →
+                  </a>
+                </div>
+
+                {/* Key Trust Badges */}
+                <div className="mt-10 grid grid-cols-3 gap-4 pt-8 border-t border-gray-200 text-center lg:text-left">
+                  <div>
+                    <span className="font-extrabold text-[#005230] block text-xl">100%</span>
+                    <span className="text-xs text-gray-600 font-medium">Sand &amp; Grit Free</span>
+                  </div>
+                  <div>
+                    <span className="font-extrabold text-[#005230] block text-xl">90 Days</span>
+                    <span className="text-xs text-gray-600 font-medium">Export Shelf Life</span>
+                  </div>
+                  <div>
+                    <span className="font-extrabold text-[#005230] block text-xl">Global</span>
+                    <span className="text-xs text-gray-600 font-medium">UK, US &amp; Nigeria</span>
                   </div>
                 </div>
-              </a>
+              </div>
+
+              {/* Hero Image Showcase - Real Authentic Round-Curled Dried Catfish */}
+              <div className="lg:col-span-5 relative">
+                <a href={`/${locale}/products/whole-round-curled-dried-catfish-big`} className="block group">
+                  <div className="relative h-80 sm:h-96 w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white transition-transform group-hover:scale-102">
+                    <Image
+                      src="/images/catfish-real-glass-plate.png"
+                      alt="Authentic Nigerian Round-Curled Dried Catfish on Plate"
+                      fill
+                      priority
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-6">
+                      <div className="text-white">
+                        <span className="bg-[#008751] text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                          ★ Signature Eja Kika (Round Curled)
+                        </span>
+                        <h3 className="font-bold text-lg mt-1 font-serif group-hover:text-emerald-300 transition-colors">
+                          Abeokuta Royal Dried Catfish
+                        </h3>
+                        <p className="text-xs text-emerald-100">
+                          Farm-raised in Abeokuta fish farms &bull; Click to view details
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -101,18 +103,20 @@ export default async function HomePage({
 
       {/* Complete 10-Product Catalogue Grid */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 pb-4 border-b border-gray-200">
-          <div>
-            <span className="text-xs font-extrabold uppercase tracking-widest text-[#008751]">
-              Farm-Raised • 100% Sand-Free • Ready to Dispatch
-            </span>
-            <h2 className="text-3xl font-extrabold text-gray-900 font-serif mt-1">
-              Our Curated Dried Catfish & Culinary Library
-            </h2>
+        <div className="bg-white/88 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-xl border border-white/60 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-2 border-b border-gray-200">
+            <div>
+              <span className="text-xs font-extrabold uppercase tracking-widest text-[#008751]">
+                Farm-Raised • 100% Sand-Free • Ready to Dispatch
+              </span>
+              <h2 className="text-3xl font-extrabold text-gray-900 font-serif mt-1">
+                Our Curated Dried Catfish &amp; Culinary Library
+              </h2>
+            </div>
+            <p className="text-xs text-gray-500 mt-2 sm:mt-0 font-medium">
+              Click any product to explore all photos, recipes &amp; direct checkout
+            </p>
           </div>
-          <p className="text-xs text-gray-500 mt-2 sm:mt-0 font-medium">
-            Click any product to explore all photos, recipes & direct checkout
-          </p>
         </div>
 
         {/* 10 Products Grid with multi-image carousels and weight ratios */}

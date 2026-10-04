@@ -39,7 +39,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className="scroll-smooth">
-      <body className="min-h-screen bg-[#FAF8F5] text-[#2D2D2D] antialiased flex flex-col font-sans">
+      <body className="min-h-screen text-[#2D2D2D] antialiased flex flex-col font-sans relative">
         <CartProvider>
           {/* Top Multilingual Rotating Cultural Banner */}
           <RotatingBanner />
@@ -52,7 +52,7 @@ export default async function LocaleLayout({
 
           {/* Main Page Content */}
           <NextIntlClientProvider messages={messages}>
-            <div className="flex-1">{children}</div>
+            <div className="flex-1 relative z-10">{children}</div>
           </NextIntlClientProvider>
 
           {/* Cultural Footer */}
