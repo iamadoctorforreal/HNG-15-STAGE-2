@@ -1,7 +1,7 @@
 import React from 'react';
 import { setRequestLocale } from 'next-intl/server';
 import { ProductCard } from '@/components/shop/ProductCard';
-import { RiverAmbience } from '@/components/motion/RiverAmbience';
+import { WaterfallBackground } from '@/components/motion/WaterfallBackground';
 import { LeadMagnetModal } from '@/components/shop/LeadMagnetModal';
 import { FALLBACK_PRODUCTS } from '@/lib/constants';
 import Image from 'next/image';
@@ -17,12 +17,12 @@ export default async function HomePage({
   const products = FALLBACK_PRODUCTS;
 
   return (
-    <div className="space-y-16 pb-16">
-      {/* Nature Waterfall & River Flow Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#e6f5ed] via-[#FAF8F5] to-white py-14 sm:py-20 border-b border-gray-100">
-        {/* Animated waterfall currents, mist, and interactive leaping catfish on mouse movement */}
-        <RiverAmbience />
+    <div className="relative space-y-16 pb-16 min-h-screen">
+      {/* Continuous Page-Wide Photorealistic Waterfall Background with Leaping Fishes */}
+      <WaterfallBackground />
 
+      {/* Hero Section */}
+      <section className="relative overflow-hidden py-14 sm:py-20 border-b border-emerald-900/10 backdrop-blur-xs">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 text-center lg:text-left">
@@ -139,8 +139,8 @@ export default async function HomePage({
       </section>
 
       {/* Cultural Heritage & Olumo Rock Story */}
-      <section className="bg-white py-16 border-y border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="bg-white/85 backdrop-blur-md p-8 sm:p-12 rounded-3xl shadow-xl border border-emerald-900/10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-6 relative h-80 rounded-3xl overflow-hidden shadow-lg border border-gray-200">
             <Image
               src="/images/waterfall-fish-farm.jpg"
@@ -160,7 +160,7 @@ export default async function HomePage({
             <p className="mt-4 text-sm text-gray-600 leading-relaxed">
               In Abeokuta, catfish is not just food — it is heritage, royalty, and warm hospitality. At Sawfy White Enterprises, our catfish is farm-raised in modern aquaculture ponds in Abeokuta, fed pure nutrition, carefully cleaned, and hygienically dried to bring you that unforgettable deep, savory aroma that elevates any soup from simple to extraordinary.
             </p>
-            <div className="mt-6 p-4 rounded-2xl bg-[#FAF8F5] border border-emerald-100">
+            <div className="mt-6 p-4 rounded-2xl bg-white/80 border border-emerald-100">
               <p className="font-serif italic text-gray-800 text-sm">
                 &ldquo;Bí o kò bá le wà ní Olúmọ, ẹja dídá wa yóò mú ilé wá sí tábìlì rẹ.&rdquo;
               </p>
