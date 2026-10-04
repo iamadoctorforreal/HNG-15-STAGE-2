@@ -80,17 +80,23 @@ export default async function HomePage({
                       priority
                       className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-6">
-                      <div className="text-white">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex items-end p-6">
+                      <div className="text-white w-full">
                         <span className="bg-[#008751] text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                           ★ Signature Eja Kika (Round Curled)
                         </span>
                         <h3 className="font-bold text-lg mt-1 font-serif group-hover:text-emerald-300 transition-colors">
                           Abeokuta Royal Dried Catfish
                         </h3>
-                        <p className="text-xs text-emerald-100">
-                          Farm-raised in Abeokuta fish farms &bull; Click to view details
+                        <p className="text-xs text-emerald-100 mt-0.5">
+                          Farm-raised in Abeokuta fish farms &bull; Ready to Dispatch
                         </p>
+                        <div className="mt-3 flex items-center justify-between pt-2 border-t border-white/20">
+                          <span className="text-base font-black text-amber-300">From ₦9,500</span>
+                          <span className="text-xs font-bold bg-[#008751] px-3.5 py-1.5 rounded-xl hover:bg-[#006b3f] transition-colors shadow-sm">
+                            🛒 View &amp; Order →
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>

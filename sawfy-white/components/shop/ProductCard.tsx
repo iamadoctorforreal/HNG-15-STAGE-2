@@ -115,7 +115,7 @@ export function ProductCard({
   return (
     <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col group">
       {/* Product Image Carousel - Clickable to Product Page */}
-      <div className="relative h-68 w-full overflow-hidden bg-gray-100 select-none">
+      <div className="relative h-64 sm:h-72 w-full overflow-hidden bg-gray-100 select-none">
         <a href={productUrl} className="block w-full h-full relative cursor-pointer">
           <Image
             src={imageGallery[activeImgIndex]}

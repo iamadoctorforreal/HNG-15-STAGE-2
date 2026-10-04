@@ -5,9 +5,28 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 export function WaterfallBackground() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [volume, setVolume] = useState(0.4);
+  const [scrollPercent, setScrollPercent] = useState(0);
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
+
+  // Track page scroll to pan down the waterfall to where the fishes are
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY || window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight > 0) {
+        const ratio = Math.min(1, Math.max(0, scrollY / docHeight));
+        setScrollPercent(ratio);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Audio Engine: Realistic Waterfall Rushing Cascades & Water Splashes
   const toggleAudio = useCallback(() => {
@@ -97,38 +116,67 @@ export function WaterfallBackground() {
     }
   };
 
-  // Ensure video auto-plays reliably & loops continuously without cutting off
+  // Video Autoplay and User Control
   useEffect(() => {
     const vid = videoRef.current;
     if (vid) {
-      vid.play().catch(() => {
-        // Handled if browser policies require user interaction
-      });
+      vid.muted = true;
+      vid.defaultMuted = true;
+      vid.playsInline = true;
+      vid
+        .play()
+        .then(() => setIsVideoPlaying(true))
+        .catch(() => {
+          setIsVideoPlaying(false);
+        });
     }
+
+    // Attempt play on first user interaction if browser blocked autoplay
+    const handleFirstTouch = () => {
+      const v = videoRef.current;
+      if (v && v.paused) {
+        v.play()
+          .then(() => setIsVideoPlaying(true))
+          .catch(() => {});
+      }
+    };
+    window.addEventListener('click', handleFirstTouch, { once: true });
+    window.addEventListener('scroll', handleFirstTouch, { once: true, passive: true });
+
+    return () => {
+      window.removeEventListener('click', handleFirstTouch);
+      window.removeEventListener('scroll', handleFirstTouch);
+    };
   }, []);
 
-  const handleTimeUpdate = () => {
+  const toggleVideoPlayback = () => {
     const vid = videoRef.current;
     if (!vid) return;
-    // Loop before the abrupt cutoff at the ending of the video
-    if (vid.currentTime >= 6.0) {
-      vid.currentTime = 0.1;
+    if (vid.paused) {
+      vid.play().then(() => setIsVideoPlaying(true));
+    } else {
+      vid.pause();
+      setIsVideoPlaying(false);
     }
   };
 
+  // Vertical position percentage as user scrolls (0% top waterfall -> 100% bottom river fishes)
+  const verticalPosition = `${Math.round(scrollPercent * 100)}%`;
+
   return (
     <>
-      {/* Page-Wide Fixed Photorealistic Waterfall Background (Vivid & Always Visible) */}
+      {/* Page-Wide Fixed Waterfall Background that pans down as you scroll */}
       <div
         className="fixed inset-0 w-full h-full pointer-events-none select-none z-0 overflow-hidden"
         style={{
           backgroundImage: "url('/images/Salmon_leaping_in_river_waterfall_2K_20261004103355.jpg')",
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: `center ${verticalPosition}`,
           backgroundRepeat: 'no-repeat',
+          transition: 'background-position 0.25s ease-out',
         }}
       >
-        {/* Photorealistic Waterfall Video Layer */}
+        {/* Photorealistic Waterfall Video Layer that also pans down on scroll */}
         <video
           ref={videoRef}
           src="/videos/waterfall-background.mp4"
@@ -137,27 +185,41 @@ export function WaterfallBackground() {
           muted
           loop
           playsInline
-          onTimeUpdate={handleTimeUpdate}
-          className="w-full h-full object-cover object-center transition-opacity duration-1000"
+          style={{
+            objectPosition: `center ${verticalPosition}`,
+            transition: 'object-position 0.25s ease-out',
+          }}
+          className="w-full h-full object-cover"
         />
 
-        {/* Subtle Dark/Mist Vignette so the vivid emerald waterfall pops behind content */}
+        {/* Soft Vignette Overlay so foreground cards and text are crisp */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/35" />
       </div>
 
-      {/* Floating Waterfall Audio Player (Bottom-Right) */}
-      <div className="fixed bottom-6 right-6 z-50 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border-2 border-[#D4A843] shadow-2xl flex items-center gap-3">
+      {/* Floating Floating Waterfall Controls (Bottom-Right) */}
+      <div className="fixed bottom-6 right-6 z-50 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border-2 border-[#D4A843] shadow-2xl flex items-center gap-2.5">
+        {/* Video Play/Pause toggle */}
+        <button
+          onClick={toggleVideoPlayback}
+          className="px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 transition-all cursor-pointer shadow-2xs border border-gray-300"
+          title="Play or pause background waterfall video"
+        >
+          <span>{isVideoPlaying ? '⏸' : '▶'}</span>
+          <span>{isVideoPlaying ? 'Video Playing' : 'Play Video'}</span>
+        </button>
+
+        {/* Waterfall Audio toggle */}
         <button
           onClick={toggleAudio}
-          className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-sm transition-all cursor-pointer ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer ${
             isPlayingAudio
               ? 'bg-[#008751] text-white ring-2 ring-emerald-300'
               : 'bg-amber-500 hover:bg-amber-600 text-white animate-pulse'
           }`}
-          title="Toggle waterfall roar & river ambience sound"
+          title="Toggle waterfall roar & river stream sound"
         >
           <span>{isPlayingAudio ? '🔊' : '▶'}</span>
-          <span>{isPlayingAudio ? 'Waterfall Sound: On' : 'Hear Waterfall Roar'}</span>
+          <span>{isPlayingAudio ? 'Sound: On' : 'Hear Roar'}</span>
         </button>
 
         {isPlayingAudio && (
@@ -169,7 +231,7 @@ export function WaterfallBackground() {
               step="0.05"
               value={volume}
               onChange={handleVolumeChange}
-              className="w-16 accent-[#008751] cursor-pointer"
+              className="w-14 accent-[#008751] cursor-pointer"
               title="Volume"
             />
           </div>
