@@ -115,7 +115,7 @@ export function ProductCard({
   return (
     <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col group">
       {/* Product Image Carousel - Clickable to Product Page */}
-      <div className="relative h-64 sm:h-72 w-full overflow-hidden bg-gray-100 select-none">
+      <div className="relative h-44 sm:h-50 w-full overflow-hidden bg-gray-100 select-none">
         <a href={productUrl} className="block w-full h-full relative cursor-pointer">
           <Image
             src={imageGallery[activeImgIndex]}
@@ -130,14 +130,14 @@ export function ProductCard({
         {/* Badge */}
         <div className="absolute top-3 left-3 z-10 pointer-events-none">
           <span
-            className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border shadow-2xs backdrop-blur-xs ${badgeStyles}`}
+            className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border shadow-2xs backdrop-blur-xs ${badgeStyles}`}
           >
             {badge}
           </span>
         </div>
 
         {is_digital && (
-          <div className="absolute top-3 right-3 z-10 bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-full text-[10px] font-bold text-gray-800 shadow-2xs border border-gray-100 pointer-events-none">
+          <div className="absolute top-3 right-3 z-10 bg-white/95 backdrop-blur-xs px-2.5 py-0.5 rounded-full text-[10px] font-bold text-gray-800 shadow-2xs border border-gray-100 pointer-events-none">
             ⚡ Instant Download
           </div>
         )}
@@ -155,20 +155,20 @@ export function ProductCard({
             <button
               onClick={prevImg}
               aria-label="Previous view"
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-black/90 text-white text-base flex items-center justify-center transition-all cursor-pointer z-10 shadow-md active:scale-90"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 text-white text-sm flex items-center justify-center transition-all cursor-pointer z-10 shadow-md active:scale-90"
             >
               ‹
             </button>
             <button
               onClick={nextImg}
               aria-label="Next view"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-black/90 text-white text-base flex items-center justify-center transition-all cursor-pointer z-10 shadow-md active:scale-90"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 text-white text-sm flex items-center justify-center transition-all cursor-pointer z-10 shadow-md active:scale-90"
             >
               ›
             </button>
 
             {/* Thumbnail dots */}
-            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10 bg-black/40 px-2.5 py-1 rounded-full backdrop-blur-xs">
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10 bg-black/40 px-2.5 py-1 rounded-full backdrop-blur-xs">
               {imageGallery.map((_, idx) => (
                 <button
                   key={idx}
@@ -189,23 +189,23 @@ export function ProductCard({
       </div>
 
       {/* Product Content */}
-      <div className="p-6 flex-1 flex flex-col justify-between">
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
         <div>
           <div className="flex items-start justify-between gap-2">
             <a href={productUrl} className="group-hover:text-[#008751] transition-colors">
-              <h3 className="font-extrabold text-base sm:text-lg text-gray-900 leading-snug line-clamp-2 hover:underline">
+              <h3 className="font-extrabold text-sm sm:text-base text-gray-900 leading-snug line-clamp-1 hover:underline">
                 {title}
               </h3>
             </a>
           </div>
 
           {weightInfo && (
-            <p className="text-[11px] font-semibold text-[#008751] bg-emerald-50 border border-emerald-100/80 inline-block px-2.5 py-0.5 rounded-full mt-2">
+            <p className="text-[10px] font-semibold text-[#008751] bg-emerald-50 border border-emerald-100/80 inline-block px-2 py-0.5 rounded-full mt-1.5">
               ⚖️ {weightInfo}
             </p>
           )}
 
-          <p className="text-xs text-gray-600 mt-2 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-gray-600 mt-1.5 line-clamp-2 leading-relaxed">
             {description}
           </p>
 
