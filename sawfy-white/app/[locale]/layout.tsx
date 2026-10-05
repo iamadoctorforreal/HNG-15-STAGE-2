@@ -59,6 +59,7 @@ export default async function LocaleLayout({
                 addressRegion: 'Ogun State',
                 addressCountry: 'NG',
               },
+              telephone: '+2348059730053',
               areaServed: ['Nigeria', 'United Kingdom', 'United States'],
             }),
           }}
@@ -115,7 +116,12 @@ export default async function LocaleLayout({
                 </h4>
                 <p>📍 Abeokuta, Ogun State, Nigeria</p>
                 <p>📧 orders@fish.sawfywhite.com</p>
-                <p>📞 WhatsApp: +234 801 234 5678</p>
+                <p>
+                  📞 <a href="tel:+2348059730053" className="hover:text-emerald-400 transition-colors">+234 805 973 0053</a>
+                </p>
+                <p>
+                  💬 <a href="https://wa.me/2348059730053?text=Hello%20Sawfy%20White%2C%20I%20would%20like%20to%20order%20dried%20catfish" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors text-emerald-300 font-bold">WhatsApp: +234 805 973 0053</a>
+                </p>
                 
                 {/* Rotating Multilingual Cultural Proverb */}
                 <RotatingProverb />

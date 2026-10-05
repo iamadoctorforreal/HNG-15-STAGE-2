@@ -1,3 +1,8 @@
+// Business Contact Details
+export const CONTACT_PHONE = '+2348059730053';
+export const CONTACT_PHONE_DISPLAY = '+234 805 973 0053';
+export const CONTACT_WHATSAPP_LINK = 'https://wa.me/2348059730053?text=Hello%20Sawfy%20White%2C%20I%20would%20like%20to%20order%20dried%20catfish';
+
 // 10 Curated Products for Sawfy White Enterprises (Strictly "Dried Catfish" - Farm-Raised in Abeokuta)
 // Synchronized 1:1 across Web, Supabase PostgreSQL, and React Native Mobile App
 export const FALLBACK_PRODUCTS = [
