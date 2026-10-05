@@ -18,7 +18,7 @@ const PROFILE_GREETINGS = [
 export default function AccountDashboardPage() {
   const supabase = createClient();
   const { addToCart } = useCart();
-  const { items: wishlist, removeFromWishlist } = useWishlist();
+  const { items: wishlist, removeFromWishlist, refreshWishlist } = useWishlist();
 
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -34,6 +34,7 @@ export default function AccountDashboardPage() {
       setLoading(false);
 
       if (user) {
+        refreshWishlist();
         setOrdersLoading(true);
         try {
           const res = await fetch(`/api/orders?userId=${user.id}&email=${encodeURIComponent(user.email || '')}`);
@@ -309,38 +310,66 @@ export default function AccountDashboardPage() {
         </div>
 
         {wishlist.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {wishlist.map((item) => (
               <div
                 key={item.id}
-                className="p-4 rounded-2xl border border-gray-200 hover:border-emerald-400 transition-all bg-[#FAF8F5] flex flex-col justify-between"
+                className="p-4 rounded-2xl border border-gray-200/90 hover:border-emerald-500 transition-all bg-white shadow-sm hover:shadow-md flex flex-col justify-between group"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      {item.tag}
-                    </span>
+                  <div className="relative w-full h-36 rounded-xl overflow-hidden bg-gray-100 mb-3">
+                    <img
+                      src={item.image || '/images/catfish-hero.jpg'}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-2 left-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full shadow-xs border border-emerald-200">
+                        {item.badge || item.weightInfo || 'Abeokuta Smoked'}
+                      </span>
+                    </div>
                     <button
                       onClick={() => handleRemoveWishlist(item.id)}
-                      className="text-gray-400 hover:text-red-500 text-xs font-bold cursor-pointer"
+                      title="Remove from Wishlist"
+                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center text-xs font-bold shadow-xs transition-colors cursor-pointer"
                     >
                       ✕
                     </button>
                   </div>
-                  <h4 className="text-xs font-bold text-gray-900 line-clamp-2 mb-1">{item.title}</h4>
-                  <p className="text-sm font-black text-[#008751]">₦{item.base_price.toLocaleString()}</p>
+                  <h4 className="text-xs font-bold text-gray-900 line-clamp-2 mb-1.5 leading-snug">
+                    {item.title}
+                  </h4>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className="text-base font-black text-[#008751]">
+                      ₦{(item.price || item.base_price || 0).toLocaleString()}
+                    </span>
+                    <span className="text-[10px] text-gray-400 font-medium">Verified Abeokuta</span>
+                  </div>
                 </div>
                 <button
                   onClick={() => handleAddWishlistToCart(item)}
-                  className="mt-4 w-full py-2 bg-white hover:bg-emerald-50 text-[#005230] border border-[#008751] font-bold text-xs rounded-xl transition-all cursor-pointer"
+                  className="mt-3 w-full py-2.5 bg-emerald-50 hover:bg-[#008751] text-[#006b3f] hover:text-white border border-emerald-300 hover:border-[#008751] font-bold text-xs rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  Move to Cart 🛒
+                  <span>Move to Cart</span>
+                  <span>🛒</span>
                 </button>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-xs text-gray-500 py-4 text-center">Your wishlist is currently empty.</p>
+          <div className="py-8 px-4 text-center bg-[#FAF8F5] rounded-2xl border border-dashed border-gray-200">
+            <span className="text-3xl block mb-2">🤍</span>
+            <p className="text-xs font-bold text-gray-700 mb-1">Your wishlist is currently empty</p>
+            <p className="text-[11px] text-gray-500 max-w-sm mx-auto mb-4 leading-relaxed">
+              Click the floating ❤️ heart button on any dried catfish or digital cookbook in the shop or mobile app. Items sync across your devices in real time.
+            </p>
+            <a
+              href="/en/products"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#008751] hover:bg-[#006b3f] text-white text-xs font-bold rounded-xl transition-all shadow-xs"
+            >
+              Browse Catalog →
+            </a>
+          </div>
         )}
       </div>
 

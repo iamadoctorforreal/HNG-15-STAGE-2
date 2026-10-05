@@ -46,23 +46,30 @@ async function getAuthenticatedUser(req: Request) {
 // GET: Retrieve Wishlist items
 export async function GET(req: Request) {
   try {
-    const user = await getAuthenticatedUser(req);
     const { searchParams } = new URL(req.url);
+    const userIdParam = searchParams.get('userId');
+    const emailParam = searchParams.get('email');
     const guestSessionId = searchParams.get('guestSessionId');
+    const user = await getAuthenticatedUser(req);
 
-    const key = user?.id || guestSessionId || 'default_user';
+    const activeUserId = user?.id || userIdParam;
+    const activeEmail = user?.email || emailParam;
+    const key = activeUserId || activeEmail || guestSessionId || 'default_user';
 
     // Try reading from user profile in Supabase if logged in
-    if (user?.id) {
+    if (activeUserId) {
       try {
         const { data: profile } = await supabaseAdmin
           .from('profiles')
           .select('preferences')
-          .eq('id', user.id)
+          .eq('id', activeUserId)
           .maybeSingle();
 
         if (profile?.preferences?.wishlist && Array.isArray(profile.preferences.wishlist)) {
-          global._wishlistStore!.set(user.id, profile.preferences.wishlist);
+          global._wishlistStore!.set(key, profile.preferences.wishlist);
+          if (activeEmail && activeEmail !== key) {
+            global._wishlistStore!.set(activeEmail, profile.preferences.wishlist);
+          }
           return NextResponse.json({ items: profile.preferences.wishlist }, { headers: CORS_HEADERS });
         }
       } catch (_) {}
@@ -80,13 +87,15 @@ export async function POST(req: Request) {
   try {
     const user = await getAuthenticatedUser(req);
     const body = await req.json();
-    const { product, guestSessionId } = body;
+    const { product, guestSessionId, userId: bodyUserId, email: bodyEmail } = body;
 
     if (!product || !product.id) {
       return NextResponse.json({ error: 'Product is required' }, { status: 400, headers: CORS_HEADERS });
     }
 
-    const key = user?.id || guestSessionId || 'default_user';
+    const activeUserId = user?.id || bodyUserId;
+    const activeEmail = user?.email || bodyEmail;
+    const key = activeUserId || activeEmail || guestSessionId || 'default_user';
     const currentItems = global._wishlistStore!.get(key) || [];
 
     const existingIndex = currentItems.findIndex((i: any) => i.id === product.id);
@@ -103,7 +112,7 @@ export async function POST(req: Request) {
         base_price: Number(product.base_price || product.price || 0),
         price: Number(product.price || product.base_price || 0),
         image: product.image || '/images/catfish-real-glass-plate.png',
-        badge: product.badge || 'Abeokuta Heritage',
+        badge: product.badge || 'Export Grade',
         weightInfo: product.weightInfo || '1kg Farm Pack',
         is_digital: !!product.is_digital,
         addedAt: new Date().toISOString(),
@@ -112,9 +121,15 @@ export async function POST(req: Request) {
     }
 
     global._wishlistStore!.set(key, updatedItems);
+    if (activeEmail && activeEmail !== key) {
+      global._wishlistStore!.set(activeEmail, updatedItems);
+    }
+    if (activeUserId && activeUserId !== key) {
+      global._wishlistStore!.set(activeUserId, updatedItems);
+    }
 
-    // Persist to user profile if logged in
-    if (user?.id) {
+    // Persist to user profile if user ID exists
+    if (activeUserId) {
       try {
         await supabaseAdmin
           .from('profiles')
@@ -122,7 +137,7 @@ export async function POST(req: Request) {
             preferences: { wishlist: updatedItems },
             updated_at: new Date().toISOString(),
           })
-          .eq('id', user.id);
+          .eq('id', activeUserId);
       } catch (_) {}
     }
 
@@ -137,15 +152,23 @@ export async function DELETE(req: Request) {
   try {
     const user = await getAuthenticatedUser(req);
     const body = await req.json();
-    const { productId, guestSessionId } = body;
+    const { productId, guestSessionId, userId: bodyUserId, email: bodyEmail } = body;
 
-    const key = user?.id || guestSessionId || 'default_user';
+    const activeUserId = user?.id || bodyUserId;
+    const activeEmail = user?.email || bodyEmail;
+    const key = activeUserId || activeEmail || guestSessionId || 'default_user';
     const currentItems = global._wishlistStore!.get(key) || [];
 
     const updatedItems = currentItems.filter((i: any) => i.id !== productId);
     global._wishlistStore!.set(key, updatedItems);
+    if (activeEmail && activeEmail !== key) {
+      global._wishlistStore!.set(activeEmail, updatedItems);
+    }
+    if (activeUserId && activeUserId !== key) {
+      global._wishlistStore!.set(activeUserId, updatedItems);
+    }
 
-    if (user?.id) {
+    if (activeUserId) {
       try {
         await supabaseAdmin
           .from('profiles')
@@ -153,7 +176,7 @@ export async function DELETE(req: Request) {
             preferences: { wishlist: updatedItems },
             updated_at: new Date().toISOString(),
           })
-          .eq('id', user.id);
+          .eq('id', activeUserId);
       } catch (_) {}
     }
 
@@ -162,3 +185,4 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: err.message }, { status: 500, headers: CORS_HEADERS });
   }
 }
+

@@ -147,23 +147,38 @@ export function ProductCard({
         </a>
 
         {/* Badge */}
-        <div className="absolute top-3 left-3 z-10 pointer-events-none">
+        {/* Badge & Digital Indicator */}
+        <div className="absolute top-3 left-3 z-10 pointer-events-none flex flex-col gap-1.5 items-start">
           <span
             className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border shadow-2xs backdrop-blur-xs ${badgeStyles}`}
           >
             {badge}
           </span>
+          {is_digital && (
+            <span className="bg-white/95 backdrop-blur-xs px-2.5 py-0.5 rounded-full text-[10px] font-bold text-gray-800 shadow-2xs border border-gray-100">
+              ⚡ Instant Download
+            </span>
+          )}
         </div>
 
-        {is_digital && (
-          <div className="absolute top-3 right-3 z-10 bg-white/95 backdrop-blur-xs px-2.5 py-0.5 rounded-full text-[10px] font-bold text-gray-800 shadow-2xs border border-gray-100 pointer-events-none">
-            ⚡ Instant Download
-          </div>
-        )}
+        {/* Wishlist Heart Button - Prominent Top Right */}
+        <button
+          type="button"
+          onClick={handleToggleHeart}
+          title={favorited ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          aria-label={favorited ? 'Remove from wishlist' : 'Add to wishlist'}
+          className={`absolute top-3 right-3 z-30 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-md hover:scale-110 active:scale-95 ${
+            favorited
+              ? 'bg-rose-50 text-rose-600 border-2 border-rose-400 shadow-rose-200 ring-2 ring-rose-100 scale-105'
+              : 'bg-white/95 hover:bg-white text-gray-500 hover:text-rose-600 border border-gray-200/90 backdrop-blur-sm'
+          }`}
+        >
+          <span className="text-base select-none leading-none">{favorited ? '❤️' : '🤍'}</span>
+        </button>
 
-        {/* Image count pill */}
+        {/* Image count pill (to the left of heart button) */}
         {imageGallery.length > 1 && (
-          <div className="absolute top-3 right-3 z-10 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-xs pointer-events-none">
+          <div className="absolute top-3.5 right-15 z-20 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-xs pointer-events-none">
             {activeImgIndex + 1}/{imageGallery.length}
           </div>
         )}
@@ -205,21 +220,8 @@ export function ProductCard({
             </div>
           </>
         )}
-
-        {/* Wishlist Heart Button */}
-        <button
-          type="button"
-          onClick={handleToggleHeart}
-          aria-label={favorited ? 'Remove from wishlist' : 'Add to wishlist'}
-          className={`absolute bottom-3 right-3 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-md ${
-            favorited
-              ? 'bg-rose-50 text-rose-600 border border-rose-300 scale-105'
-              : 'bg-white/85 hover:bg-white text-gray-500 hover:text-rose-500 backdrop-blur-xs border border-white/60'
-          }`}
-        >
-          <span className="text-sm leading-none">{favorited ? '❤️' : '🤍'}</span>
-        </button>
       </div>
+
 
       {/* Product Content */}
       <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
 import { ProductCard } from '@/components/shop/ProductCard';
 
 interface Variant {
@@ -34,6 +35,7 @@ interface ProductDetailViewProps {
 export function ProductDetailView({ product, relatedProducts, locale }: ProductDetailViewProps) {
   const router = useRouter();
   const { addToCart, openCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [selectedImgIndex, setSelectedImgIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState<Variant | undefined>(
@@ -44,6 +46,21 @@ export function ProductDetailView({ product, relatedProducts, locale }: ProductD
   const images = product.images && product.images.length > 0 ? product.images : ['/images/catfish-jumbo.jpg'];
   const currentPrice = selectedVariant ? selectedVariant.price : product.base_price;
   const totalPrice = currentPrice * quantity;
+  const favorited = isInWishlist(product.id);
+
+  const handleToggleWishlist = () => {
+    toggleWishlist({
+      id: product.id,
+      title: product.title,
+      slug: product.slug,
+      base_price: product.base_price,
+      price: currentPrice,
+      image: images[0],
+      badge: product.badge,
+      weightInfo: product.weightInfo,
+      is_digital: product.is_digital,
+    });
+  };
 
   const handleAddToCart = () => {
     addToCart({
@@ -161,18 +178,34 @@ export function ProductDetailView({ product, relatedProducts, locale }: ProductD
 
         {/* Right: Product Details, Pricing, Options & Actions */}
         <div className="lg:col-span-5 space-y-6">
-          <div>
-            <span className="text-xs font-extrabold uppercase tracking-widest text-[#008751]">
-              Sawfy White Enterprises • Abeokuta
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 font-serif mt-2 leading-tight">
-              {product.title}
-            </h1>
-            {product.weightInfo && (
-              <p className="text-xs font-bold text-[#008751] bg-emerald-50 border border-emerald-200 inline-block px-3 py-1 rounded-full mt-3">
-                ⚖️ {product.weightInfo}
-              </p>
-            )}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <span className="text-xs font-extrabold uppercase tracking-widest text-[#008751]">
+                Sawfy White Enterprises • Abeokuta
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-black text-gray-900 font-serif mt-2 leading-tight">
+                {product.title}
+              </h1>
+              {product.weightInfo && (
+                <p className="text-xs font-bold text-[#008751] bg-emerald-50 border border-emerald-200 inline-block px-3 py-1 rounded-full mt-3">
+                  ⚖️ {product.weightInfo}
+                </p>
+              )}
+            </div>
+
+            {/* Prominent Heart Button */}
+            <button
+              onClick={handleToggleWishlist}
+              title={favorited ? 'Remove from Wishlist' : 'Add to Wishlist'}
+              aria-label={favorited ? 'Remove from wishlist' : 'Add to wishlist'}
+              className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all cursor-pointer shadow-md hover:scale-110 active:scale-95 ${
+                favorited
+                  ? 'bg-rose-50 text-rose-600 border-2 border-rose-400 shadow-rose-200 ring-2 ring-rose-100 scale-105'
+                  : 'bg-white hover:bg-gray-50 text-gray-400 hover:text-rose-600 border border-gray-200'
+              }`}
+            >
+              <span className="text-xl select-none leading-none">{favorited ? '❤️' : '🤍'}</span>
+            </button>
           </div>
 
           <p className="text-sm text-gray-700 leading-relaxed">
@@ -247,7 +280,7 @@ export function ProductDetailView({ product, relatedProducts, locale }: ProductD
             </div>
           </div>
 
-          {/* Action Buttons: Add to Cart + Instant Buy Now */}
+          {/* Action Buttons: Add to Cart + Instant Buy Now + Wishlist */}
           <div className="space-y-3 pt-2">
             <button
               onClick={handleBuyNow}
@@ -267,7 +300,19 @@ export function ProductDetailView({ product, relatedProducts, locale }: ProductD
             >
               <span>{added ? '✓ Added to Cart!' : '🛒 Add to Cart'}</span>
             </button>
+
+            <button
+              onClick={handleToggleWishlist}
+              className={`w-full py-3.5 rounded-2xl font-bold text-xs border transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 ${
+                favorited
+                  ? 'bg-rose-50 text-rose-600 border-rose-300'
+                  : 'bg-white hover:bg-rose-50/50 text-gray-700 border-gray-300 hover:text-rose-600 hover:border-rose-300'
+              }`}
+            >
+              <span>{favorited ? '❤️ Saved in Your Wishlist (Tap to remove)' : '🤍 Save to Wishlist'}</span>
+            </button>
           </div>
+
 
           {/* Culinary & Rehydration Guidance */}
           <div className="p-5 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-2 text-xs text-amber-950">

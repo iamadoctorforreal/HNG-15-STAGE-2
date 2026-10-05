@@ -42,13 +42,19 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   const refreshWishlist = useCallback(async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       const { data: { session } } = await supabase.auth.getSession();
       const headers: Record<string, string> = {};
       if (session?.access_token) {
         headers['Authorization'] = `Bearer ${session.access_token}`;
       }
 
-      const res = await fetch('/api/wishlist', {
+      const q = new URLSearchParams();
+      if (user?.id) q.set('userId', user.id);
+      if (user?.email) q.set('email', user.email);
+      const url = q.toString() ? `/api/wishlist?${q.toString()}` : '/api/wishlist';
+
+      const res = await fetch(url, {
         cache: 'no-store',
         headers,
       });
@@ -105,6 +111,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   const toggleWishlist = async (product: any) => {
     const exists = isInWishlist(product.id);
+    const { data: { user } } = await supabase.auth.getUser();
     const { data: { session } } = await supabase.auth.getSession();
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (session?.access_token) {
@@ -118,7 +125,11 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         await fetch('/api/wishlist', {
           method: 'DELETE',
           headers,
-          body: JSON.stringify({ productId: product.id }),
+          body: JSON.stringify({
+            productId: product.id,
+            userId: user?.id,
+            email: user?.email,
+          }),
         });
         broadcastSync();
       } catch (_) {}
@@ -140,7 +151,11 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         await fetch('/api/wishlist', {
           method: 'POST',
           headers,
-          body: JSON.stringify({ product: newItem }),
+          body: JSON.stringify({
+            product: newItem,
+            userId: user?.id,
+            email: user?.email,
+          }),
         });
         broadcastSync();
       } catch (_) {}
@@ -150,6 +165,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const removeFromWishlist = async (productId: string) => {
     setItems((prev) => prev.filter((i) => i.id !== productId));
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       const { data: { session } } = await supabase.auth.getSession();
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (session?.access_token) {
@@ -158,11 +174,16 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       await fetch('/api/wishlist', {
         method: 'DELETE',
         headers,
-        body: JSON.stringify({ productId }),
+        body: JSON.stringify({
+          productId,
+          userId: user?.id,
+          email: user?.email,
+        }),
       });
       broadcastSync();
     } catch (_) {}
   };
+
 
   return (
     <WishlistContext.Provider
