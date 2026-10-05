@@ -158,7 +158,16 @@ export function Navbar({ locale = 'en' }: { locale?: string }) {
               {user ? (
                 // Logged In: Show Greeting + Sign Out (+ Admin if admin role)
                 <div className="flex items-center gap-3">
-                  <RotatingUserGreeting name={firstName || 'Customer'} />
+                  <a href={`/${locale}/account`} className="hover:opacity-85 transition-opacity">
+                    <RotatingUserGreeting name={firstName || 'Customer'} />
+                  </a>
+
+                  <a
+                    href={`/${locale}/account`}
+                    className="text-xs text-[#005230] bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 transition-colors font-bold hidden sm:inline"
+                  >
+                    👤 Dashboard
+                  </a>
 
                   {/* ONLY show Admin link if user is verified admin */}
                   {isAdmin && (

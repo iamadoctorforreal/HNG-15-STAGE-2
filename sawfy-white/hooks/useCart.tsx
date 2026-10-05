@@ -88,12 +88,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     };
     window.addEventListener('focus', handleFocus);
 
-    // 2. Realtime listener on Supabase cart_items
+    // 2. Realtime listener: Listen on both Postgres changes and Instant Broadcast
     let channel: any = null;
     try {
       const supabase = createClient();
       channel = supabase
-        .channel('public:cart_items')
+        .channel('sawfy_cart_sync')
+        .on('broadcast', { event: 'cart_sync' }, () => {
+          refreshCart();
+        })
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'cart_items' },
@@ -106,8 +109,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       console.warn('Realtime subscription skipped', e);
     }
 
+    // 3. Continuous background sync polling every 3 seconds
+    const pollTimer = setInterval(() => {
+      refreshCart();
+    }, 3000);
+
     return () => {
       window.removeEventListener('focus', handleFocus);
+      clearInterval(pollTimer);
       if (channel) {
         try {
           const supabase = createClient();
