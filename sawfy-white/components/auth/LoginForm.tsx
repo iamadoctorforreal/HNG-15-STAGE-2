@@ -51,25 +51,43 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
           throw new Error(regData.error || 'Registration failed');
         }
 
-        if (regData.requiresVerification) {
-          setVerificationSent(true);
+        // Instantly sign in with Supabase
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (signInError) {
+          window.location.href = '/en/login';
           return;
         }
 
         window.location.href = '/en';
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        let { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
+
+        if (error && error.message.toLowerCase().includes('email not confirmed')) {
+          // Unblock unconfirmed accounts by calling registration auto-activation
+          try {
+            const autoConfirmRes = await fetch('/api/auth/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, password }),
+            });
+            if (autoConfirmRes.ok) {
+              const retry = await supabase.auth.signInWithPassword({ email, password });
+              error = retry.error;
+            }
+          } catch {}
+        }
+
         if (error) {
-          if (error.message.toLowerCase().includes('email not confirmed')) {
-            throw new Error(
-              'Your email is not verified yet. Please check your inbox for the activation link we sent you.'
-            );
-          }
           throw error;
         }
+
         window.location.href = '/en';
       }
     } catch (err: any) {

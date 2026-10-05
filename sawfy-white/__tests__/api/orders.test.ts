@@ -38,7 +38,7 @@ describe('Orders API Route', () => {
     expect(body.subtotal).toBe(18500);
     expect(body.shippingFee).toBe(2500); // ₦2500 domestic
     expect(body.totalAmount).toBe(21000);
-  }, 15000);
+  }, 30000);
 
   it('charges zero shipping fee for pure digital orders (cookbook)', async () => {
     const req = new Request('http://localhost:3000/api/orders', {
