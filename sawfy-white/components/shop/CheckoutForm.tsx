@@ -23,10 +23,10 @@ export function CheckoutForm({
   initialItems?: CheckoutItem[];
   currency?: 'NGN' | 'USD';
 }) {
-  const { items: cartItems } = useCart();
+  const { items: cartItems, clearCart } = useCart();
   const supabase = createClient();
 
-  const activeItems: CheckoutItem[] =
+  const items: CheckoutItem[] =
     cartItems.length > 0
       ? cartItems.map((c) => ({
           productId: c.id,
@@ -37,20 +37,7 @@ export function CheckoutForm({
           quantity: c.quantity,
           isDigital: c.is_digital,
         }))
-      : initialItems.length > 0
-        ? initialItems
-        : [
-            {
-              productId: '00000000-0000-0000-0000-000000000001',
-              title: 'Whole Round-Curled Dried Catfish (1kg Pack)',
-              variantTitle: '1kg Standard Pack (4-6 curled fish)',
-              unitPrice: 18500,
-              quantity: 1,
-              isDigital: false,
-            },
-          ];
-
-  const [items] = useState<CheckoutItem[]>(activeItems);
+      : initialItems;
 
   // Auth state
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -191,9 +178,10 @@ export function CheckoutForm({
         throw new Error(orderData.error || 'Failed to initialize order');
       }
 
-      const orderId = orderData.orderId;
+    const orderId = orderData.orderId;
+    clearCart();
 
-      // 2. Gateway Routing (Invisible to user)
+    // 2. Gateway Routing (Invisible to user)
       const provider = routePaymentMethod(selectedMethod);
 
       if (provider === 'paystack') {
@@ -240,6 +228,26 @@ export function CheckoutForm({
       setIsSubmitting(false);
     }
   };
+
+  if (items.length === 0) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-20 text-center">
+        <div className="w-20 h-20 bg-emerald-50 text-[#008751] rounded-full flex items-center justify-center mx-auto mb-6 text-3xl border border-emerald-200">
+          🛒
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-3">Your Cart is Empty</h2>
+        <p className="text-gray-600 mb-8 max-w-md mx-auto">
+          You don&apos;t have any items in your cart yet. Explore our Abeokuta export-grade dried catfish and digital cookbook selection!
+        </p>
+        <a
+          href="/products"
+          className="inline-flex items-center gap-2 bg-[#008751] text-white px-8 py-3.5 rounded-xl font-bold text-base hover:bg-[#006b3f] transition-all shadow-md hover:shadow-lg"
+        >
+          Explore Dried Catfish Catalog &rarr;
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">

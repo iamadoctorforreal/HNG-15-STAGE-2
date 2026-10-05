@@ -49,8 +49,27 @@ export async function GET(req: Request) {
       );
     }
 
+    // Merge each DB product with its curated images and metadata so every item has distinct imagery
+    const enrichedProducts = products.map((p) => {
+      const match = FALLBACK_PRODUCTS.find((f) => f.id === p.id || f.slug === p.slug);
+      const images = (p.images && Array.isArray(p.images) && p.images.length > 0)
+        ? p.images
+        : (match?.images && match.images.length > 0)
+          ? match.images
+          : ['/images/catfish-real-glass-plate.png'];
+
+      return {
+        ...match,
+        ...p,
+        images,
+        badge: p.badge || match?.badge || (p.is_digital ? 'Digital Product' : 'Export Grade'),
+        weightInfo: p.weightInfo || match?.weightInfo || 'Farm Pack',
+        variants: (p.variants && p.variants.length > 0) ? p.variants : (match?.variants || []),
+      };
+    });
+
     return NextResponse.json(
-      { products, source: 'database' },
+      { products: enrichedProducts, source: 'database' },
       { headers: CORS_HEADERS }
     );
   } catch (error: any) {

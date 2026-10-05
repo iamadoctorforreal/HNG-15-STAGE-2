@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { sendOrderConfirmationEmail } from '@/lib/mailgun';
 
 export const dynamic = 'force-dynamic';
 
@@ -91,6 +92,27 @@ export async function POST(req: Request) {
     }));
 
     await supabaseAdmin.from('order_items').insert(orderItems);
+
+    // Send order confirmation / invoice email with dashboard order tracking link
+    try {
+      const recipientEmail = shippingAddress?.email || guestEmail;
+      if (recipientEmail) {
+        await sendOrderConfirmationEmail({
+          to: recipientEmail,
+          orderId: order.id,
+          customerName: guestName || shippingAddress?.firstName || 'Valued Customer',
+          totalAmount: `${currency === 'USD' ? '$' : '₦'}${Number(totalAmount).toLocaleString()}`,
+          items: items.map((i: any) => ({
+            title: i.title || i.product_title,
+            quantity: i.quantity || 1,
+            unitPrice: i.unitPrice || i.unit_price,
+            totalPrice: (i.quantity || 1) * (i.unitPrice || i.unit_price),
+          })),
+        });
+      }
+    } catch (emailErr) {
+      console.warn('Failed to send immediate invoice email:', emailErr);
+    }
 
     return NextResponse.json({
       orderId: order.id,

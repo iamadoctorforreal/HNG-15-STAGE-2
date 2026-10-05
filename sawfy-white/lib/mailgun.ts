@@ -70,12 +70,22 @@ export async function sendOrderConfirmationEmail({
   customerName,
   totalAmount,
   downloadToken,
+  items,
 }: {
   to: string;
   orderId: string;
   customerName: string;
   totalAmount: string;
   downloadToken?: string;
+  items?: Array<{
+    title?: string;
+    product_title?: string;
+    quantity: number;
+    unitPrice?: number;
+    unit_price?: number;
+    totalPrice?: number;
+    total_price?: number;
+  }>;
 }) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://shop.sawfywhite.com';
   const downloadSection = downloadToken
@@ -86,30 +96,70 @@ export async function sendOrderConfirmationEmail({
       </div>`
     : '';
 
+  const itemsTableHtml = items && items.length > 0
+    ? `
+      <div style="margin:20px 0;">
+        <h3 style="color:#2D2D2D;font-size:15px;margin-bottom:8px;border-bottom:1px solid #ddd;padding-bottom:4px;">Itemized Invoice Summary</h3>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;text-align:left;">
+          <thead>
+            <tr style="border-bottom:1px solid #ccc;color:#666;">
+              <th style="padding:6px 0;">Item</th>
+              <th style="padding:6px 0;text-align:center;">Qty</th>
+              <th style="padding:6px 0;text-align:right;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items
+              .map(
+                (item) => `
+              <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px 0;color:#2D2D2D;font-weight:600;">${item.title || item.product_title || 'Abeokuta Dried Catfish'}</td>
+                <td style="padding:8px 0;text-align:center;color:#666;">${item.quantity}</td>
+                <td style="padding:8px 0;text-align:right;color:#008751;font-weight:600;">₦${Number(item.totalPrice || item.total_price || (item.unitPrice || item.unit_price || 0) * item.quantity).toLocaleString()}</td>
+              </tr>
+            `
+              )
+              .join('')}
+          </tbody>
+        </table>
+      </div>
+    `
+    : '';
+
   return await dispatchMailgunREST({
     to,
-    subject: `Order Confirmation #${orderId.slice(0, 8)} — Sawfy White Enterprises`,
-    text: `Thank you for your order, ${customerName}!\n\nOrder ID: ${orderId}\nTotal: ${totalAmount}\n\nWe are preparing your premium export-grade dried catfish from Abeokuta.\n\n— Sawfy White Enterprises`,
+    subject: `Order Invoice #${orderId.slice(0, 8)} — Sawfy White Enterprises`,
+    text: `Thank you for your order, ${customerName}!\n\nOrder ID: ${orderId}\nTotal: ${totalAmount}\n\nTrack your order in real-time anytime from your dashboard:\n${siteUrl}/en/account\n\nWe are preparing your premium export-grade dried catfish from Abeokuta.\n\n— Sawfy White Enterprises`,
     html: `
-      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:12px;">
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:12px;background:#ffffff;">
         <div style="text-align:center;border-bottom:2px solid #008751;padding-bottom:16px;margin-bottom:24px;">
           <h1 style="color:#008751;margin:0;font-size:24px;">Sawfy White Enterprises</h1>
           <p style="color:#666;margin:4px 0 0 0;">Premium Export-Grade Dried Catfish from Abeokuta</p>
         </div>
-        <h2 style="color:#2D2D2D;">Congratulations! Thank you for your order, ${customerName}!</h2>
+        <h2 style="color:#2D2D2D;margin-bottom:4px;">Congratulations! Thank you for your order, ${customerName}!</h2>
         <p style="color:#008751;font-size:13px;font-weight:bold;margin-top:2px;">
           Félicitations • Barka • Ẹ kú oríire • Ekele
         </p>
-        <p style="color:#555;font-size:16px;line-height:1.5;">
-          Your order has been received and verified. Our Abeokuta team is carefully packing your premium dried catfish for safe dispatch.
+        <p style="color:#555;font-size:15px;line-height:1.5;">
+          Your order has been recorded in our system. Our Abeokuta team is preparing your premium dried catfish for safe, vacuum-sealed dispatch.
         </p>
-        <div style="background:#FAF8F5;padding:16px;border-radius:8px;margin:20px 0;">
-          <p style="margin:4px 0;"><strong>Order ID:</strong> #${orderId.slice(0, 8)}</p>
-          <p style="margin:4px 0;"><strong>Total Paid:</strong> ${totalAmount}</p>
-          <p style="margin:4px 0;"><strong>Status:</strong> Processing & Packing</p>
+        <div style="background:#FAF8F5;padding:16px;border-radius:8px;margin:16px 0;border:1px solid #F0EDE8;">
+          <p style="margin:4px 0;"><strong>Order Reference:</strong> #${orderId.slice(0, 8)}</p>
+          <p style="margin:4px 0;"><strong>Total Invoice Amount:</strong> <span style="color:#008751;font-weight:bold;">${totalAmount}</span></p>
+          <p style="margin:4px 0;"><strong>Status:</strong> Processing &amp; Packaging</p>
         </div>
+        ${itemsTableHtml}
         ${downloadSection}
-        <div style="border-top:1px solid #eee;padding-top:16px;margin-top:24px;font-size:13px;color:#888;text-align:center;">
+        <div style="background:#E6F5ED;border:1px solid #B3E0C9;border-radius:8px;padding:16px;margin:24px 0;text-align:center;">
+          <h3 style="color:#005230;margin-top:0;font-size:16px;">Track Your Order on Your Dashboard</h3>
+          <p style="color:#444;font-size:13px;line-height:1.5;margin-bottom:12px;">
+            You can monitor live fulfillment and shipping progress 24/7 on your customer dashboard or directly in the mobile app:
+          </p>
+          <a href="${siteUrl}/en/account" style="background:#008751;color:#ffffff;padding:10px 22px;text-decoration:none;border-radius:6px;display:inline-block;font-weight:bold;font-size:14px;">
+            Track Order on Dashboard &rarr;
+          </a>
+        </div>
+        <div style="border-top:1px solid #eee;padding-top:16px;margin-top:24px;font-size:12px;color:#888;text-align:center;">
           <p>Sawfy White Enterprises • Abeokuta, Ogun State, Nigeria 🇳🇬</p>
           <p>Questions? Contact us anytime at orders@fish.sawfywhite.com</p>
         </div>
