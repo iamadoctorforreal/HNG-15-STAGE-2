@@ -32,3 +32,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 **/next-env.d.ts
+
+# mobile standalone repo
+sawfy-white-mobile/
+HNG-15-STAGE-3-MOBILE-APP/

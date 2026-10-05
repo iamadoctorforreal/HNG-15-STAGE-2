@@ -412,7 +412,8 @@ For final submission, the following three deliverables are required:
    - Upload the APK to Google Drive (or an equivalent accessible file-sharing platform with public download permissions).
    - Provide the direct download link.
 2. **Repository Link**:
-   - Public GitHub or Git repository link containing the full source code for the mobile application.
+   - `https://github.com/iamadoctorforreal/HNG-15-STAGE-3-MOBILE-APP.git`
+   - Public GitHub repository containing the full source code for the mobile application.
 3. **Video Demonstration (Continuous Single Take)**:
    - Must be a **single continuous video recording** (no cuts or video splices) demonstrating cross-platform sync with the existing e-commerce store:
      - **Step 1**: Open web application (`shop.sawfywhite.com`) and register/sign in with a new account. Show successful login state.

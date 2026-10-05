@@ -15,9 +15,9 @@
 3. **Physical Device Validation**:
    - Tested and verified on a physical Android smartphone.
 4. **HNG Submission Deliverables**:
-   - Public APK download link (Google Drive).
-   - Git repository link containing full source code.
-   - Single continuous video demonstration covering all 6 mandatory verification steps.
+   - **Repository Link**: [https://github.com/iamadoctorforreal/HNG-15-STAGE-3-MOBILE-APP.git](https://github.com/iamadoctorforreal/HNG-15-STAGE-3-MOBILE-APP.git)
+   - **APK Download Link**: Public Google Drive download link (Release APK).
+   - **Video Demonstration**: Single continuous video covering all 6 mandatory verification steps.
 
 ---
 
