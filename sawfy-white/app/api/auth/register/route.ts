@@ -23,7 +23,10 @@ export async function POST(req: Request) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const fullName = `${firstName || ''} ${lastName || ''}`.trim() || cleanEmail.split('@')[0];
+    const cleanFirstName = firstName?.trim() || '';
+    const cleanLastName = lastName?.trim() || '';
+    const fullName = `${cleanFirstName} ${cleanLastName}`.trim() || cleanEmail.split('@')[0];
+    const preferredGreetingName = cleanFirstName || fullName.split(' ')[0] || 'Friend';
 
     // 1. Check if user already exists in Supabase
     let userId: string | null = null;
@@ -40,8 +43,8 @@ export async function POST(req: Request) {
           password,
           email_confirm: true,
           user_metadata: {
-            first_name: firstName || existing.user_metadata?.first_name || '',
-            last_name: lastName || existing.user_metadata?.last_name || '',
+            first_name: cleanFirstName || existing.user_metadata?.first_name || '',
+            last_name: cleanLastName || existing.user_metadata?.last_name || '',
             full_name: fullName,
           },
         }
@@ -57,8 +60,8 @@ export async function POST(req: Request) {
         password,
         email_confirm: true,
         user_metadata: {
-          first_name: firstName || '',
-          last_name: lastName || '',
+          first_name: cleanFirstName,
+          last_name: cleanLastName,
           full_name: fullName,
         },
       });
@@ -79,11 +82,11 @@ export async function POST(req: Request) {
       });
     }
 
-    // 3. Dispatch welcome email via Mailgun in background (non-blocking)
+    // 3. Dispatch personalized welcome email via Mailgun with first name
     try {
       await sendWelcomeRegistrationEmail({
         to: cleanEmail,
-        name: firstName || fullName,
+        name: preferredGreetingName,
       });
     } catch (mailErr) {
       console.warn('Mailgun welcome email dispatch warning (non-blocking):', mailErr);
@@ -94,7 +97,8 @@ export async function POST(req: Request) {
       requiresVerification: false,
       autoConfirmed: true,
       email: cleanEmail,
-      message: 'Account created and activated successfully! Signing you in...',
+      firstName: preferredGreetingName,
+      message: 'Account registered successfully! Please sign in with your email and password.',
     });
   } catch (err: any) {
     return NextResponse.json(

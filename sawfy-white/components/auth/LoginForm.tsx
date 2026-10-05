@@ -1,19 +1,31 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 
 export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
+  const [currentMode, setCurrentMode] = useState<'login' | 'signup'>(mode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [verificationSent, setVerificationSent] = useState(false);
+  const [registeredUser, setRegisteredUser] = useState<{ email: string; name: string } | null>(null);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const supabase = createClient();
+
+  useEffect(() => {
+    // Check if email was passed in URL query
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlEmail = params.get('email');
+      if (urlEmail) {
+        setEmail(urlEmail);
+      }
+    }
+  }, []);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -39,7 +51,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
     setMessage(null);
 
     try {
-      if (mode === 'signup') {
+      if (currentMode === 'signup') {
         const regRes = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -51,18 +63,13 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
           throw new Error(regData.error || 'Registration failed');
         }
 
-        // Instantly sign in with Supabase
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+        // Show explicit registration success state requiring them to log in
+        setRegisteredUser({
+          email: regData.email || email,
+          name: regData.firstName || firstName || 'Valued Customer',
         });
-
-        if (signInError) {
-          window.location.href = '/en/login';
-          return;
-        }
-
-        window.location.href = '/en';
+        setPassword('');
+        return;
       } else {
         let { error } = await supabase.auth.signInWithPassword({
           email,
@@ -70,7 +77,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
         });
 
         if (error && error.message.toLowerCase().includes('email not confirmed')) {
-          // Unblock unconfirmed accounts by calling registration auto-activation
+          // Auto-confirm account via API and retry
           try {
             const autoConfirmRes = await fetch('/api/auth/register', {
               method: 'POST',
@@ -97,35 +104,40 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
     }
   };
 
-  if (verificationSent) {
+  // 1. Explicit Registration Success Screen
+  if (registeredUser) {
     return (
-      <div className="max-w-md w-full mx-auto bg-white p-8 rounded-3xl border-2 border-[#008751]/20 shadow-xl text-center">
+      <div className="max-w-md w-full mx-auto bg-white p-8 rounded-3xl border-2 border-[#008751]/30 shadow-xl text-center">
         <BrandLogo size="md" showText={false} className="mb-4 mx-auto" />
-        <div className="w-16 h-16 rounded-full bg-emerald-100 text-[#008751] text-3xl flex items-center justify-center mx-auto mb-4">
-          ✉️
+        <div className="w-16 h-16 rounded-full bg-emerald-100 text-[#008751] text-3xl flex items-center justify-center mx-auto mb-4 font-black">
+          ✓
+        </div>
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[#006b3f] text-xs font-bold mb-3 border border-emerald-200">
+          <span>🎉</span> Registration Successful
         </div>
         <h2 className="text-2xl font-black font-serif text-gray-900">
-          Check Your Email
+          Ẹ kú oríire, {registeredUser.name}!
         </h2>
         <p className="text-xs text-gray-600 mt-3 leading-relaxed">
-          We have sent a secure activation link to <strong className="text-gray-900">{email}</strong>.
+          Your Sawfy White account has been successfully created and activated! We also sent a personalized welcome confirmation to <strong className="text-gray-900">{registeredUser.email}</strong>.
         </p>
-        <p className="text-[11px] text-gray-500 mt-2 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed">
-          Please check your inbox (or spam/promotions folder) and click <strong>&ldquo;Verify &amp; Activate Account&rdquo;</strong> to complete your registration.
-        </p>
+        <div className="text-xs text-gray-700 mt-4 bg-emerald-50/70 p-4 rounded-xl border border-emerald-100 leading-relaxed font-medium">
+          Please sign in with your email and password below to access your account and shopping cart.
+        </div>
 
         <div className="mt-6 flex flex-col gap-2.5">
-          <a
-            href="/en/login"
-            className="w-full py-3.5 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-xl text-xs shadow-md transition-all text-center"
-          >
-            Go to Sign In →
-          </a>
           <button
-            onClick={() => setVerificationSent(false)}
-            className="text-xs text-gray-500 hover:text-gray-800 font-semibold cursor-pointer py-1"
+            onClick={() => {
+              setCurrentMode('login');
+              setRegisteredUser(null);
+              setMessage({
+                text: 'Registration complete! Please enter your password to sign in.',
+                type: 'success',
+              });
+            }}
+            className="w-full py-3.5 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-xl text-xs shadow-md hover:shadow-lg transition-all text-center cursor-pointer"
           >
-            ← Back to edit email or try again
+            Sign In with Your Password →
           </button>
         </div>
       </div>
@@ -137,12 +149,12 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
       <div className="text-center mb-6 flex flex-col items-center">
         <BrandLogo size="md" showText={false} className="mb-2" />
         <h2 className="text-2xl font-black font-serif text-gray-900">
-          {mode === 'signup' ? 'Create Your Account' : 'Welcome Back'}
+          {currentMode === 'signup' ? 'Create Your Account' : 'Welcome Back'}
         </h2>
         <p className="text-xs text-gray-500 mt-1">
-          {mode === 'signup'
+          {currentMode === 'signup'
             ? 'Join Sawfy White to track dried catfish shipments & save orders'
-            : 'Sign in to access your orders and cookbook library'}
+            : 'Sign in to access your orders and synchronized cart'}
         </p>
       </div>
 
@@ -195,14 +207,15 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
       </div>
 
       <form onSubmit={handleEmailAuth} className="space-y-4">
-        {mode === 'signup' && (
+        {currentMode === 'signup' && (
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1">
-                First Name
+                First Name *
               </label>
               <input
                 type="text"
+                required
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-[#008751] focus:outline-none"
@@ -258,24 +271,36 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
           disabled={loading}
           className="w-full py-3.5 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-xl text-xs shadow-md transition-all disabled:opacity-50 cursor-pointer"
         >
-          {loading ? 'Processing...' : mode === 'signup' ? 'Create Account & Sign In →' : 'Sign In →'}
+          {loading ? 'Processing...' : currentMode === 'signup' ? 'Create Account →' : 'Sign In →'}
         </button>
       </form>
 
       <div className="mt-6 text-center text-xs text-gray-500">
-        {mode === 'signup' ? (
+        {currentMode === 'signup' ? (
           <p>
             Already have an account?{' '}
-            <a href="/en/login" className="text-[#008751] font-bold hover:underline">
+            <button
+              onClick={() => {
+                setMessage(null);
+                setCurrentMode('login');
+              }}
+              className="text-[#008751] font-bold hover:underline cursor-pointer"
+            >
               Sign In
-            </a>
+            </button>
           </p>
         ) : (
           <p>
-            Don't have an account?{' '}
-            <a href="/en/signup" className="text-[#008751] font-bold hover:underline">
+            Don&apos;t have an account?{' '}
+            <button
+              onClick={() => {
+                setMessage(null);
+                setCurrentMode('signup');
+              }}
+              className="text-[#008751] font-bold hover:underline cursor-pointer"
+            >
               Create an Account
-            </a>
+            </button>
           </p>
         )}
       </div>

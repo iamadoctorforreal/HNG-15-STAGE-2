@@ -110,7 +110,7 @@ export async function sendWelcomeRegistrationEmail({
     const res = await client.messages.create(domain, {
       from: `Sawfy White Enterprises <${from}>`,
       to: [to],
-      subject: `Ẹ kú àbọ̀! Welcome to Sawfy White Enterprises 🐟`,
+      subject: `Ẹ kú àbọ̀, ${displayName}! Welcome to Sawfy White Enterprises 🐟`,
       text: `Hello ${displayName},\n\nWelcome to Sawfy White Enterprises! Your customer account is now active.\n\nYou can track orders, download cookbooks, and enjoy priority dispatch for farm-raised Abeokuta dried catfish.\n\nVisit your account: ${siteUrl}/en/account\n\n— Sawfy White Enterprises, Abeokuta`,
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:12px;background:#ffffff;">

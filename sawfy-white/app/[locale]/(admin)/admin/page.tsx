@@ -35,6 +35,11 @@ export default function AdminDashboardPage() {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
+  // Admin access control state
+  const [authLoading, setAuthLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isAdminUser, setIsAdminUser] = useState(false);
+
   // New product form state
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -49,6 +54,37 @@ export default function AdminDashboardPage() {
 
   const [savingProduct, setSavingProduct] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Verify admin credentials on mount
+  useEffect(() => {
+    async function verifyAdminAuth() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setAuthLoading(false);
+          return;
+        }
+        setCurrentUser(user);
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profile?.role === 'admin') {
+          setIsAdminUser(true);
+        }
+      } catch (err) {
+        console.warn('Admin auth verification error:', err);
+      } finally {
+        setAuthLoading(false);
+      }
+    }
+
+    verifyAdminAuth();
+  }, []);
 
   // Load orders from Supabase on mount
   useEffect(() => {
@@ -177,6 +213,85 @@ export default function AdminDashboardPage() {
   const totalRevenue = orders
     .filter((o) => o.status === 'paid' || o.status === 'shipped')
     .reduce((sum, o) => sum + o.total_amount, 0);
+
+  // 1. Loading State
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-6">
+        <div className="text-center">
+          <BrandLogo size="md" showText={false} className="mx-auto mb-4 animate-pulse" />
+          <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">
+            Verifying Administrator Access...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Unauthenticated: Prompt Admin to Sign In
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-gray-200 shadow-xl text-center">
+          <BrandLogo size="md" showText={false} className="mx-auto mb-4" />
+          <div className="w-16 h-16 rounded-full bg-amber-100 text-amber-800 text-2xl flex items-center justify-center mx-auto mb-4 font-bold">
+            🔒
+          </div>
+          <h2 className="text-2xl font-black font-serif text-gray-900">
+            Admin Sign-In Required
+          </h2>
+          <p className="text-xs text-gray-600 mt-3 leading-relaxed">
+            This dashboard is restricted to store managers. Please sign in with an authorized Sawfy White administrator account to proceed.
+          </p>
+          <div className="mt-6 flex flex-col gap-2.5">
+            <a
+              href="/en/login"
+              className="w-full py-3.5 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-xl text-xs shadow-md transition-all text-center"
+            >
+              Sign In as Administrator →
+            </a>
+            <a
+              href="/en"
+              className="text-xs text-gray-500 hover:text-gray-800 font-semibold py-1"
+            >
+              ← Return to Public Storefront
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Authenticated but NOT Admin: Hide Admin & Deny Access
+  if (!isAdminUser) {
+    return (
+      <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-red-200 shadow-xl text-center">
+          <BrandLogo size="md" showText={false} className="mx-auto mb-4" />
+          <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 text-3xl flex items-center justify-center mx-auto mb-4 font-bold">
+            ⛔
+          </div>
+          <h2 className="text-2xl font-black font-serif text-gray-900">
+            Access Denied
+          </h2>
+          <p className="text-xs text-gray-600 mt-3 leading-relaxed">
+            Your account (<strong className="text-gray-900">{currentUser.email}</strong>) is a customer account and does not have administrator permissions.
+          </p>
+          <p className="text-[11px] text-red-800 bg-red-50 p-3 rounded-xl border border-red-100 mt-3 font-medium">
+            Administrative management tools are restricted to authorized Sawfy White staff.
+          </p>
+          <div className="mt-6">
+            <a
+              href="/en"
+              className="inline-block w-full py-3.5 bg-[#008751] hover:bg-[#006b3f] text-white font-bold rounded-xl text-xs shadow-md transition-all text-center"
+            >
+              ← Return to Storefront
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] pb-20">
