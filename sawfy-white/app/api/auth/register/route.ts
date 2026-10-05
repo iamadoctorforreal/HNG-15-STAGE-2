@@ -83,13 +83,17 @@ export async function POST(req: Request) {
     }
 
     // 3. Dispatch personalized welcome email via Mailgun with first name
+    let mailgunResult: any = null;
+    let mailgunError: any = null;
     try {
-      await sendWelcomeRegistrationEmail({
+      const mgRes = await sendWelcomeRegistrationEmail({
         to: cleanEmail,
         name: preferredGreetingName,
       });
-    } catch (mailErr) {
-      console.warn('Mailgun welcome email dispatch warning (non-blocking):', mailErr);
+      mailgunResult = { dispatched: true, id: mgRes?.id || null };
+    } catch (mailErr: any) {
+      console.error('Mailgun welcome email dispatch warning:', mailErr);
+      mailgunError = mailErr?.message || String(mailErr);
     }
 
     return NextResponse.json({
@@ -98,6 +102,7 @@ export async function POST(req: Request) {
       autoConfirmed: true,
       email: cleanEmail,
       firstName: preferredGreetingName,
+      mailgun: mailgunResult || { dispatched: false, error: mailgunError },
       message: 'Account registered successfully! Please sign in with your email and password.',
     });
   } catch (err: any) {
