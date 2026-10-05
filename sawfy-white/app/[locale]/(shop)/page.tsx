@@ -1,6 +1,7 @@
 import React from 'react';
 import { setRequestLocale } from 'next-intl/server';
 import { ProductCard } from '@/components/shop/ProductCard';
+import { CatalogExplorer } from '@/components/shop/CatalogExplorer';
 import { WaterfallBackground } from '@/components/motion/WaterfallBackground';
 import { LeadMagnetModal } from '@/components/shop/LeadMagnetModal';
 import { RotatingHeroGreeting } from '@/components/ui/RotatingHeroGreeting';
@@ -130,27 +131,8 @@ export default async function HomePage({
             </p>
           </div>
 
-          {/* 10 Products Grid with multi-image carousels and weight ratios */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((prod) => (
-              <ProductCard
-                key={prod.id}
-                id={prod.id}
-                title={prod.title}
-                slug={prod.slug}
-                description={prod.description}
-                base_price={prod.base_price}
-                image={prod.images[0]}
-                images={prod.images}
-                badge={prod.badge}
-                badgeColor={prod.badgeColor}
-                is_digital={prod.is_digital}
-                variants={prod.variants}
-                weightInfo={prod.weightInfo}
-                locale={locale}
-              />
-            ))}
-          </div>
+          {/* Live Search & Category Explorer with 10 Products Grid */}
+          <CatalogExplorer products={products} locale={locale} />
         </div>
       </section>
 

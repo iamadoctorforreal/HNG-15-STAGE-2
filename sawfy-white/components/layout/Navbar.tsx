@@ -141,15 +141,17 @@ export function Navbar({ locale = 'en' }: { locale?: string }) {
         <nav className="flex items-center gap-3 sm:gap-6 text-sm font-semibold text-gray-700">
           <a
             href={`/${locale}`}
-            className="hover:text-[#008751] transition-colors"
+            className="flex items-center gap-1 hover:text-[#008751] transition-colors font-bold text-xs sm:text-sm text-[#006b3f]"
           >
-            Home
+            <span>🏠</span>
+            <span>Home</span>
           </a>
           <a
             href={`/${locale}/products`}
-            className="hover:text-[#008751] transition-colors"
+            className="flex items-center gap-1 hover:text-[#008751] transition-colors font-bold text-xs sm:text-sm text-gray-700"
           >
-            Products
+            <span>🐟</span>
+            <span>Products</span>
           </a>
           <a
             href={`/${locale}/blog`}
