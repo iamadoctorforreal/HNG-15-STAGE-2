@@ -5,6 +5,50 @@ import { useCart } from '@/hooks/useCart';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 import { createClient } from '@/lib/supabase/client';
 
+const USER_GREETINGS = [
+  { prefix: 'Welcome back' },
+  { prefix: 'Bon retour' },
+  { prefix: 'Barka da dawowa' },
+  { prefix: 'Ẹ kú àbọ̀' },
+  { prefix: 'Nnọọ ọzọ' },
+];
+
+function RotatingUserGreeting({ name }: { name: string }) {
+  const [index, setIndex] = useState(0);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setIndex((prev) => (prev + 1) % USER_GREETINGS.length);
+        setFade(true);
+      }, 300);
+    }, 4000);
+
+    const stopTimer = setTimeout(() => {
+      clearInterval(interval);
+    }, 120000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(stopTimer);
+    };
+  }, []);
+
+  const current = USER_GREETINGS[index];
+
+  return (
+    <span
+      className={`text-xs text-gray-600 font-medium hidden sm:inline transition-opacity duration-300 ${
+        fade ? 'opacity-100' : 'opacity-0'
+      }`}
+    >
+      {current.prefix}, <strong className="text-[#005230]">{name}</strong>!
+    </span>
+  );
+}
+
 export function Navbar({ locale = 'en' }: { locale?: string }) {
   const { totalItems, openCart } = useCart();
   const [user, setUser] = useState<any>(null);
@@ -114,9 +158,7 @@ export function Navbar({ locale = 'en' }: { locale?: string }) {
               {user ? (
                 // Logged In: Show Greeting + Sign Out (+ Admin if admin role)
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-gray-600 font-medium hidden sm:inline">
-                    Welcome back, <strong className="text-[#005230]">{firstName || 'Customer'}</strong>!
-                  </span>
+                  <RotatingUserGreeting name={firstName || 'Customer'} />
 
                   {/* ONLY show Admin link if user is verified admin */}
                   {isAdmin && (

@@ -96,7 +96,10 @@ export async function sendOrderConfirmationEmail({
           <h1 style="color:#008751;margin:0;font-size:24px;">Sawfy White Enterprises</h1>
           <p style="color:#666;margin:4px 0 0 0;">Premium Export-Grade Dried Catfish from Abeokuta</p>
         </div>
-        <h2 style="color:#2D2D2D;">Ẹ kú oríire! Thank you for your order, ${customerName}!</h2>
+        <h2 style="color:#2D2D2D;">Congratulations! Thank you for your order, ${customerName}!</h2>
+        <p style="color:#008751;font-size:13px;font-weight:bold;margin-top:2px;">
+          Félicitations • Barka • Ẹ kú oríire • Ekele
+        </p>
         <p style="color:#555;font-size:16px;line-height:1.5;">
           Your order has been received and verified. Our Abeokuta team is carefully packing your premium dried catfish for safe dispatch.
         </p>
@@ -128,7 +131,7 @@ export async function sendWelcomeRegistrationEmail({
 
   return await dispatchMailgunREST({
     to,
-    subject: `Ẹ kú àbọ̀, ${displayName}! Welcome to Sawfy White Enterprises 🐟`,
+    subject: `Welcome, ${displayName}! — Sawfy White Enterprises 🐟`,
     text: `Hello ${displayName},\n\nWelcome to Sawfy White Enterprises! Your customer account is now active.\n\nYou can track orders, download cookbooks, and enjoy priority dispatch for farm-raised Abeokuta dried catfish.\n\nVisit your account: ${siteUrl}/en/account\n\n— Sawfy White Enterprises, Abeokuta`,
     html: `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:12px;background:#ffffff;">
@@ -136,7 +139,10 @@ export async function sendWelcomeRegistrationEmail({
           <h1 style="color:#008751;margin:0;font-size:24px;">Sawfy White Enterprises</h1>
           <p style="color:#666;margin:4px 0 0 0;">Farm-Raised Export Dried Catfish • Abeokuta, Nigeria</p>
         </div>
-        <h2 style="color:#2D2D2D;">Ẹ kú àbọ̀, ${displayName}!</h2>
+        <h2 style="color:#2D2D2D;margin-bottom:4px;">Welcome, ${displayName}!</h2>
+        <p style="color:#008751;font-size:13px;font-weight:bold;margin-top:0;margin-bottom:16px;">
+          Bienvenue • Barka da zuwa • Ẹ kú àbọ̀ • Nnọọ
+        </p>
         <p style="color:#555;font-size:15px;line-height:1.6;">
           Your customer account with <strong>Sawfy White Enterprises</strong> is now active. You have full access to our catalog, expedited domestic and diaspora checkout, and order delivery tracking.
         </p>
@@ -215,8 +221,10 @@ export async function sendVerificationEmail({
         <div style="text-align:center;border-bottom:2px solid #008751;padding-bottom:16px;margin-bottom:24px;">
           <h1 style="color:#008751;margin:0;font-size:24px;">Sawfy White Enterprises</h1>
           <p style="color:#666;margin:4px 0 0 0;">Abeokuta Fish Farms • Dried Catfish</p>
-        </div>
-        <h2 style="color:#2D2D2D;">Ẹ kú àbọ̀, ${displayName}!</h2>
+        <h2 style="color:#2D2D2D;margin-bottom:4px;">Welcome, ${displayName}!</h2>
+        <p style="color:#008751;font-size:13px;font-weight:bold;margin-top:0;margin-bottom:16px;">
+          Bienvenue • Barka da zuwa • Ẹ kú àbọ̀ • Nnọọ
+        </p>
         <p style="color:#555;font-size:15px;line-height:1.6;">
           Thank you for creating an account with <strong>Sawfy White Enterprises</strong>. Please verify your email address to activate your customer profile and access your orders.
         </p>

@@ -3,6 +3,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { WaterfallBackground } from '@/components/motion/WaterfallBackground';
 import { LeadMagnetModal } from '@/components/shop/LeadMagnetModal';
+import { RotatingHeroGreeting } from '@/components/ui/RotatingHeroGreeting';
 import { FALLBACK_PRODUCTS } from '@/lib/constants';
 import Image from 'next/image';
 
@@ -27,6 +28,11 @@ export default async function HomePage({
           <div className="bg-white/88 backdrop-blur-md p-6 sm:p-10 rounded-3xl shadow-2xl border border-white/60">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               <div className="lg:col-span-7 text-center lg:text-left">
+                {/* Rotating Cultural Greeting */}
+                <div className="block">
+                  <RotatingHeroGreeting />
+                </div>
+
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#008751]/10 text-[#006b3f] text-xs font-bold uppercase tracking-wider mb-6 border border-[#008751]/20">
                   <span>🌾</span> Farm-Raised in Abeokuta Fish Farms • Export-Grade
                 </div>

@@ -4,21 +4,6 @@ import React, { useState, useEffect } from 'react';
 
 const MESSAGES = [
   {
-    lang: 'Yorùbá',
-    flag: '🇳🇬',
-    text: 'Ẹ kú àbọ̀! Ẹja àrọ̀ dídá tó dára jùlọ láti Abẹ́òkúta sí gbogbo àgbáyé',
-  },
-  {
-    lang: 'Hausa',
-    flag: '🇳🇬',
-    text: 'Barka da zuwa! Kifin busasshe mai inganci daga Abeokuta zuwa gidajenku',
-  },
-  {
-    lang: 'Igbo',
-    flag: '🇳🇬',
-    text: 'Nnọọ! Azụ kpọrọ nkụ kacha mma si Abeokuta ruo tebụl gị',
-  },
-  {
     lang: 'English',
     flag: '🌍',
     text: 'Welcome! Export-grade premium dried catfish from Abeokuta to Nigeria, UK & USA',
@@ -28,6 +13,21 @@ const MESSAGES = [
     flag: '🇫🇷',
     text: "Bienvenue! Poisson-chat séché d'Abeokuta de qualité export expédié dans le monde entier",
   },
+  {
+    lang: 'Hausa',
+    flag: '🇳🇬',
+    text: 'Barka da zuwa! Kifin busasshe mai inganci daga Abeokuta zuwa gidajenku',
+  },
+  {
+    lang: 'Yorùbá',
+    flag: '🇳🇬',
+    text: 'Ẹ kú àbọ̀! Ẹja àrọ̀ dídá tó dára jùlọ láti Abẹ́òkúta sí gbogbo àgbáyé',
+  },
+  {
+    lang: 'Igbo',
+    flag: '🇳🇬',
+    text: 'Nnọọ! Azụ kpọrọ nkụ kacha mma si Abeokuta ruo tebụl gị',
+  },
 ];
 
 export function RotatingBanner() {
@@ -35,6 +35,7 @@ export function RotatingBanner() {
   const [fade, setFade] = useState(true);
 
   useEffect(() => {
+    // Rotate every 4s, stop automatically after 2 minutes (120,000ms)
     const interval = setInterval(() => {
       setFade(false);
       setTimeout(() => {
@@ -43,7 +44,14 @@ export function RotatingBanner() {
       }, 350);
     }, 4000);
 
-    return () => clearInterval(interval);
+    const stopTimer = setTimeout(() => {
+      clearInterval(interval);
+    }, 120000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(stopTimer);
+    };
   }, []);
 
   const current = MESSAGES[index];

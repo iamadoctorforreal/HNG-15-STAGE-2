@@ -11,24 +11,6 @@ interface ProverbItem {
 
 const PROVERBS: ProverbItem[] = [
   {
-    lang: 'Yorùbá',
-    flag: '🇳🇬',
-    proverb: 'Bí o kò bá le wà ní Olúmọ, ẹja dídá wa yóò mú ilé wá sí tábìlì rẹ.',
-    translation: 'If you cannot be at Olumo Rock, our dried catfish brings home to your table.',
-  },
-  {
-    lang: 'Hausa',
-    flag: '🇳🇬',
-    proverb: 'Idan ba za ka iya kasancewa a Olumo ba, busasshen kifinmu zai kawo gida teburinka.',
-    translation: 'Wherever you reside, our dried fish brings the authentic taste of home.',
-  },
-  {
-    lang: 'Igbo',
-    flag: '🇳🇬',
-    proverb: 'Ọ bụrụ na ị pụghị ịnọ na Olumo, azụ kpọrọ nkụ anyị ga-ebute ụlọ na tebụl gị.',
-    translation: 'Even across oceans, our dried fish delivers the warmth of our heritage.',
-  },
-  {
     lang: 'English',
     flag: '🌍',
     proverb: 'Though oceans lie between us and Olumo Rock, our dried catfish brings home to your table.',
@@ -40,6 +22,24 @@ const PROVERBS: ProverbItem[] = [
     proverb: "Même loin du rocher d'Olumo, notre poisson séché apporte la maison à votre table.",
     translation: "La véritable saveur traditionnelle d'Abeokuta servie chez vous.",
   },
+  {
+    lang: 'Hausa',
+    flag: '🇳🇬',
+    proverb: 'Idan ba za ka iya kasancewa a Olumo ba, busasshen kifinmu zai kawo gida teburinka.',
+    translation: 'Wherever you reside, our dried fish brings the authentic taste of home.',
+  },
+  {
+    lang: 'Yorùbá',
+    flag: '🇳🇬',
+    proverb: 'Bí o kò bá le wà ní Olúmọ, ẹja dídá wa yóò mú ilé wá sí tábìlì rẹ.',
+    translation: 'If you cannot be at Olumo Rock, our dried catfish brings home to your table.',
+  },
+  {
+    lang: 'Igbo',
+    flag: '🇳🇬',
+    proverb: 'Ọ bụrụ na ị pụghị ịnọ na Olumo, azụ kpọrọ nkụ anyị ga-ebute ụlọ na tebụl gị.',
+    translation: 'Even across oceans, our dried fish delivers the warmth of our heritage.',
+  },
 ];
 
 export function RotatingProverb() {
@@ -47,6 +47,7 @@ export function RotatingProverb() {
   const [fade, setFade] = useState(true);
 
   useEffect(() => {
+    // Rotate every 5s, stop automatically after 2 minutes (120,000ms)
     const timer = setInterval(() => {
       setFade(false);
       setTimeout(() => {
@@ -55,7 +56,14 @@ export function RotatingProverb() {
       }, 400);
     }, 5000);
 
-    return () => clearInterval(timer);
+    const stopTimer = setTimeout(() => {
+      clearInterval(timer);
+    }, 120000);
+
+    return () => {
+      clearInterval(timer);
+      clearTimeout(stopTimer);
+    };
   }, []);
 
   const current = PROVERBS[index];

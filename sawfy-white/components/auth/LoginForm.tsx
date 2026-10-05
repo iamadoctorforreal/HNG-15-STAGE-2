@@ -4,6 +4,57 @@ import React, { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 
+const CONGRATS_GREETINGS = [
+  { lang: 'English', getHeading: (name: string) => `Congratulations, ${name}!` },
+  { lang: 'Français', getHeading: (name: string) => `Félicitations, ${name}!` },
+  { lang: 'Hausa', getHeading: (name: string) => `Barka, ${name}!` },
+  { lang: 'Yorùbá', getHeading: (name: string) => `Ẹ kú oríire, ${name}!` },
+  { lang: 'Igbo', getHeading: (name: string) => `Ekele, ${name}!` },
+];
+
+function RotatingCongratsHeading({ name }: { name: string }) {
+  const [index, setIndex] = useState(0);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setIndex((prev) => (prev + 1) % CONGRATS_GREETINGS.length);
+        setFade(true);
+      }, 350);
+    }, 3500);
+
+    const stopTimer = setTimeout(() => {
+      clearInterval(interval);
+    }, 120000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(stopTimer);
+    };
+  }, []);
+
+  const current = CONGRATS_GREETINGS[index];
+
+  return (
+    <div>
+      <div className="mb-1">
+        <span className="inline-block px-2 py-0.5 rounded-full bg-emerald-100 text-[#006b3f] text-[10px] font-bold uppercase tracking-wider">
+          {current.lang}
+        </span>
+      </div>
+      <h2
+        className={`text-2xl font-black font-serif text-gray-900 transition-all duration-300 transform ${
+          fade ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'
+        }`}
+      >
+        {current.getHeading(name)}
+      </h2>
+    </div>
+  );
+}
+
 export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
   const [currentMode, setCurrentMode] = useState<'login' | 'signup'>(mode);
   const [email, setEmail] = useState('');
@@ -115,9 +166,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[#006b3f] text-xs font-bold mb-3 border border-emerald-200">
           <span>🎉</span> Registration Successful
         </div>
-        <h2 className="text-2xl font-black font-serif text-gray-900">
-          Ẹ kú oríire, {registeredUser.name}!
-        </h2>
+        <RotatingCongratsHeading name={registeredUser.name} />
         <p className="text-xs text-gray-600 mt-3 leading-relaxed">
           Your Sawfy White account has been successfully created and activated! We also sent a personalized welcome confirmation to <strong className="text-gray-900">{registeredUser.email}</strong>.
         </p>
