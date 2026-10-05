@@ -1,14 +1,11 @@
 // Sawfy White Enterprises — Fail-Safe Mailgun REST Client
 // Uses native fetch directly against Mailgun EU API (https://api.eu.mailgun.net)
 
-const MG_KEY =
-  process.env.MAILGUN_API_KEY && process.env.MAILGUN_API_KEY.includes('-')
-    ? process.env.MAILGUN_API_KEY
-    : Buffer.from('MTBlYmVkYTQ2NTE2MTRlYzE3ZWZjYTIzNjE2ZGY4YTAtNzU0M2U5ODUtMTg4YmE1ZTQ=', 'base64').toString('utf8');
-
-const MG_DOMAIN = process.env.MAILGUN_DOMAIN || 'fish.sawfywhite.com';
+const VERIFIED_MG_KEY = Buffer.from('MTBlYmVkYTQ2NTE2MTRlYzE3ZWZjYTIzNjE2ZGY4YTAtNzU0M2U5ODUtMTg4YmE1ZTQ=', 'base64').toString('utf8');
+const MG_KEY = VERIFIED_MG_KEY;
+const MG_DOMAIN = 'fish.sawfywhite.com';
 const MG_URL = 'https://api.eu.mailgun.net';
-const MG_FROM = process.env.MAILGUN_FROM_EMAIL || 'orders@fish.sawfywhite.com';
+const MG_FROM = 'orders@fish.sawfywhite.com';
 
 async function dispatchMailgunREST({
   to,
@@ -38,7 +35,14 @@ async function dispatchMailgunREST({
     body: body.toString(),
   });
 
-  const data = await res.json();
+  const resText = await res.text();
+  let data: any;
+  try {
+    data = JSON.parse(resText);
+  } catch {
+    data = { message: resText };
+  }
+
   if (!res.ok) {
     console.error('Mailgun API Error:', res.status, data);
     throw new Error(data.message || `Mailgun HTTP ${res.status}`);

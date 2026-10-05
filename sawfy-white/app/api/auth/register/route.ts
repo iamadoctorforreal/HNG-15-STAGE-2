@@ -4,6 +4,16 @@ import { sendWelcomeRegistrationEmail } from '@/lib/mailgun';
 
 export const dynamic = 'force-dynamic';
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
+}
+
 export async function POST(req: Request) {
   try {
     const { email, password, firstName, lastName } = await req.json();
@@ -11,14 +21,14 @@ export async function POST(req: Request) {
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
-        { status: 400 }
+        { status: 400, headers: CORS_HEADERS }
       );
     }
 
     if (password.length < 6) {
       return NextResponse.json(
         { error: 'Password must be at least 6 characters' },
-        { status: 400 }
+        { status: 400, headers: CORS_HEADERS }
       );
     }
 
@@ -50,7 +60,7 @@ export async function POST(req: Request) {
         }
       );
       if (updateError) {
-        return NextResponse.json({ error: updateError.message }, { status: 400 });
+        return NextResponse.json({ error: updateError.message }, { status: 400, headers: CORS_HEADERS });
       }
       userId = updated.user.id;
     } else {
@@ -67,7 +77,7 @@ export async function POST(req: Request) {
       });
 
       if (createError) {
-        return NextResponse.json({ error: createError.message }, { status: 400 });
+        return NextResponse.json({ error: createError.message }, { status: 400, headers: CORS_HEADERS });
       }
       userId = createdUser?.user?.id || null;
     }
@@ -104,11 +114,11 @@ export async function POST(req: Request) {
       firstName: preferredGreetingName,
       mailgun: mailgunResult || { dispatched: false, error: mailgunError },
       message: 'Account registered successfully! Please sign in with your email and password.',
-    });
+    }, { headers: CORS_HEADERS });
   } catch (err: any) {
     return NextResponse.json(
       { error: err?.message || 'Registration failed' },
-      { status: 500 }
+      { status: 500, headers: CORS_HEADERS }
     );
   }
 }
