@@ -86,7 +86,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${origin}/api/auth/callback?next=/en/account`,
+          redirectTo: `${origin}/api/auth/callback?next=/en`,
         },
       });
       if (error) throw error;
@@ -146,7 +146,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
           throw error;
         }
 
-        window.location.href = '/en/account';
+        window.location.href = '/en';
       }
     } catch (err: any) {
       setMessage({ text: err?.message || 'Authentication failed', type: 'error' });

@@ -138,10 +138,16 @@ export function Navbar({ locale = 'en' }: { locale?: string }) {
         </a>
 
         {/* Links & Interactive Cart */}
-        <nav className="flex items-center gap-4 sm:gap-6 text-sm font-semibold text-gray-700">
+        <nav className="flex items-center gap-3 sm:gap-6 text-sm font-semibold text-gray-700">
+          <a
+            href={`/${locale}`}
+            className="hover:text-[#008751] transition-colors"
+          >
+            Home
+          </a>
           <a
             href={`/${locale}/products`}
-            className="hover:text-[#008751] transition-colors hidden sm:inline"
+            className="hover:text-[#008751] transition-colors"
           >
             Products
           </a>

@@ -40,6 +40,30 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className="scroll-smooth">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'OnlineStore',
+              name: 'Sawfy White Enterprises',
+              description:
+                'Export-grade dried catfish sourced and prepared in Abeokuta, Ogun State, Nigeria. 100% sand-free.',
+              url: 'https://shop.sawfywhite.com',
+              logo: 'https://shop.sawfywhite.com/images/catfish-hero.jpg',
+              priceRange: '₦3,500 - ₦165,000',
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: 'Abeokuta',
+                addressRegion: 'Ogun State',
+                addressCountry: 'NG',
+              },
+              areaServed: ['Nigeria', 'United Kingdom', 'United States'],
+            }),
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-[#FAF8F5] text-[#2D2D2D] antialiased flex flex-col font-sans relative">
         <CartProvider>
           <WishlistProvider>
