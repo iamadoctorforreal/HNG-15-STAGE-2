@@ -41,7 +41,7 @@ export function CheckoutForm({
         ? initialItems
         : [
             {
-              productId: 'prod-001',
+              productId: '00000000-0000-0000-0000-000000000001',
               title: 'Whole Round-Curled Dried Catfish (1kg Pack)',
               variantTitle: '1kg Standard Pack (4-6 curled fish)',
               unitPrice: 18500,
