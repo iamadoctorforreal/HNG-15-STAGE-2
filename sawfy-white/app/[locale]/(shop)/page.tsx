@@ -109,42 +109,42 @@ export default async function HomePage({
 
       {/* Complete 10-Product Catalogue Grid */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="bg-white/88 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-xl border border-white/60 mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-2 border-b border-gray-200">
+        <div className="bg-white/92 backdrop-blur-md p-6 sm:p-10 rounded-3xl shadow-xl border border-emerald-900/10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-6 mb-8 border-b border-gray-200">
             <div>
               <span className="text-xs font-extrabold uppercase tracking-widest text-[#008751]">
-                Farm-Raised • 100% Sand-Free • Ready to Dispatch
+                Farm-Raised in Abeokuta • 100% Sand-Free • Ready to Dispatch
               </span>
-              <h2 className="text-3xl font-extrabold text-gray-900 font-serif mt-1">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 font-serif mt-1">
                 Our Curated Dried Catfish &amp; Culinary Library
               </h2>
             </div>
-            <p className="text-xs text-gray-500 mt-2 sm:mt-0 font-medium">
+            <p className="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-0 font-medium">
               Click any product to explore all photos, recipes &amp; direct checkout
             </p>
           </div>
-        </div>
 
-        {/* 10 Products Grid with multi-image carousels and weight ratios */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.map((prod) => (
-            <ProductCard
-              key={prod.id}
-              id={prod.id}
-              title={prod.title}
-              slug={prod.slug}
-              description={prod.description}
-              base_price={prod.base_price}
-              image={prod.images[0]}
-              images={prod.images}
-              badge={prod.badge}
-              badgeColor={prod.badgeColor}
-              is_digital={prod.is_digital}
-              variants={prod.variants}
-              weightInfo={prod.weightInfo}
-              locale={locale}
-            />
-          ))}
+          {/* 10 Products Grid with multi-image carousels and weight ratios */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {products.map((prod) => (
+              <ProductCard
+                key={prod.id}
+                id={prod.id}
+                title={prod.title}
+                slug={prod.slug}
+                description={prod.description}
+                base_price={prod.base_price}
+                image={prod.images[0]}
+                images={prod.images}
+                badge={prod.badge}
+                badgeColor={prod.badgeColor}
+                is_digital={prod.is_digital}
+                variants={prod.variants}
+                weightInfo={prod.weightInfo}
+                locale={locale}
+              />
+            ))}
+          </div>
         </div>
       </section>
 

@@ -115,7 +115,7 @@ export function ProductCard({
   return (
     <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col group">
       {/* Product Image Carousel - Clickable to Product Page */}
-      <div className="relative h-44 sm:h-50 w-full overflow-hidden bg-gray-100 select-none">
+      <div className="relative h-60 sm:h-64 w-full overflow-hidden bg-gray-100 select-none">
         <a href={productUrl} className="block w-full h-full relative cursor-pointer">
           <Image
             src={imageGallery[activeImgIndex]}
@@ -193,7 +193,7 @@ export function ProductCard({
         <div>
           <div className="flex items-start justify-between gap-2">
             <a href={productUrl} className="group-hover:text-[#008751] transition-colors">
-              <h3 className="font-extrabold text-sm sm:text-base text-gray-900 leading-snug line-clamp-1 hover:underline">
+              <h3 className="font-extrabold text-sm sm:text-base text-gray-900 leading-snug line-clamp-2 min-h-[2.5rem] hover:underline">
                 {title}
               </h3>
             </a>

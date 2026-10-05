@@ -49,7 +49,7 @@ export function RotatingBanner() {
   const current = MESSAGES[index];
 
   return (
-    <div className="bg-[#004729] text-emerald-100 text-xs py-2 px-4 border-b border-emerald-800/80 shadow-xs relative overflow-hidden">
+    <div className="bg-[#004729] text-emerald-100 text-xs py-2 px-4 border-b border-emerald-800/80 shadow-xs relative z-50 overflow-hidden">
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
         {/* Subtle Water Stream Indicator */}
         <div className="hidden sm:flex items-center gap-1.5 opacity-75 text-[11px] text-[#E8C468]">

@@ -586,8 +586,8 @@ export function WaterfallBackground() {
           transition: 'background-position 0.25s ease-out',
         }}
       >
-        {/* Soft Vignette Overlay for maximum foreground card readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
+        {/* Warm Abeokuta Cream Overlay for harmonious readability and brand identity */}
+        <div className="absolute inset-0 bg-[#FAF8F5]/75 backdrop-blur-[0.5px] pointer-events-none" />
 
         {/* Programmatic 3D Water Streams, Concentric Ripples & Photorealistic Leaping Fish Layer */}
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
