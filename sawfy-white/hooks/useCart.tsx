@@ -58,12 +58,33 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setIsInitialized(true);
   }, []);
 
+  // Broadcast real-time sync event to other tabs / mobile app
+  const broadcastSync = useCallback(() => {
+    try {
+      const supabase = createClient();
+      supabase.channel('sawfy_cart_sync').send({
+        type: 'broadcast',
+        event: 'cart_sync',
+        payload: { source: 'web', timestamp: Date.now() },
+      });
+    } catch (_) {}
+  }, []);
+
   // Fetch latest cart from server /api/cart
   const refreshCart = useCallback(async () => {
     try {
       let gId = guestSessionId || (typeof window !== 'undefined' ? localStorage.getItem('sawfy_guest_id') : '');
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const headers: Record<string, string> = {};
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch(`/api/cart${gId ? `?guestSessionId=${gId}` : ''}`, {
         cache: 'no-store',
+        headers,
       });
       if (res.ok) {
         const data = await res.json();
@@ -109,10 +130,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       console.warn('Realtime subscription skipped', e);
     }
 
-    // 3. Continuous background sync polling every 3 seconds
+    // 3. Continuous background sync polling every 1.2 seconds for rapid cross-device sync
     const pollTimer = setInterval(() => {
       refreshCart();
-    }, 3000);
+    }, 1200);
 
     return () => {
       window.removeEventListener('focus', handleFocus);
@@ -171,6 +192,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       });
       // Silent refetch to sync identifiers
       setTimeout(refreshCart, 400);
+      broadcastSync();
     } catch (err) {
       console.warn('Failed to sync added item to server', err);
     }
@@ -190,6 +212,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           guestSessionId: gId,
         }),
       });
+      broadcastSync();
     } catch (err) {
       console.warn('Failed to sync remove to server', err);
     }
@@ -220,6 +243,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           guestSessionId: gId,
         }),
       });
+      broadcastSync();
     } catch (err) {
       console.warn('Failed to sync quantity to server', err);
     }
@@ -237,6 +261,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           guestSessionId: gId,
         }),
       });
+      broadcastSync();
     } catch (err) {
       console.warn('Failed to sync clear cart to server', err);
     }

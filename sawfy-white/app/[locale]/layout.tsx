@@ -4,6 +4,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { CartProvider } from '@/hooks/useCart';
+import { WishlistProvider } from '@/hooks/useWishlist';
 import { Navbar } from '@/components/layout/Navbar';
 import { RotatingBanner } from '@/components/layout/RotatingBanner';
 import { RotatingProverb } from '@/components/layout/RotatingProverb';
@@ -41,8 +42,9 @@ export default async function LocaleLayout({
     <html lang={locale} className="scroll-smooth">
       <body className="min-h-screen bg-[#FAF8F5] text-[#2D2D2D] antialiased flex flex-col font-sans relative">
         <CartProvider>
-          {/* Top Multilingual Rotating Cultural Banner */}
-          <RotatingBanner />
+          <WishlistProvider>
+            {/* Top Multilingual Rotating Cultural Banner */}
+            <RotatingBanner />
 
           {/* Dynamic Navbar */}
           <Navbar locale={locale} />
@@ -101,6 +103,7 @@ export default async function LocaleLayout({
               <span className="text-emerald-400 font-medium">Rooted in Abeokuta, Sourced with Heritage 🇳🇬</span>
             </div>
           </footer>
+          </WishlistProvider>
         </CartProvider>
       </body>
     </html>

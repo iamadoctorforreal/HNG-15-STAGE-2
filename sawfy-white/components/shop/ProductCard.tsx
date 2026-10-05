@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
 
 export interface ProductVariantData {
   id: string;
@@ -44,6 +45,7 @@ export function ProductCard({
 }: ProductCardProps) {
   const router = useRouter();
   const { addToCart, openCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [selectedVariant, setSelectedVariant] = useState<ProductVariantData | undefined>(
     variants.length > 0 ? variants[0] : undefined
   );
@@ -55,6 +57,23 @@ export function ProductCard({
 
   const currentPrice = selectedVariant ? selectedVariant.price : base_price;
   const productUrl = `/${locale}/products/${slug}`;
+  const favorited = isInWishlist(id);
+
+  const handleToggleHeart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    toggleWishlist({
+      id,
+      title,
+      slug,
+      base_price,
+      price: currentPrice,
+      image: imageGallery[0],
+      badge,
+      weightInfo,
+      is_digital,
+    });
+  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -186,6 +205,20 @@ export function ProductCard({
             </div>
           </>
         )}
+
+        {/* Wishlist Heart Button */}
+        <button
+          type="button"
+          onClick={handleToggleHeart}
+          aria-label={favorited ? 'Remove from wishlist' : 'Add to wishlist'}
+          className={`absolute bottom-3 right-3 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-md ${
+            favorited
+              ? 'bg-rose-50 text-rose-600 border border-rose-300 scale-105'
+              : 'bg-white/85 hover:bg-white text-gray-500 hover:text-rose-500 backdrop-blur-xs border border-white/60'
+          }`}
+        >
+          <span className="text-sm leading-none">{favorited ? '❤️' : '🤍'}</span>
+        </button>
       </div>
 
       {/* Product Content */}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 import Image from 'next/image';
 
@@ -17,45 +18,12 @@ const PROFILE_GREETINGS = [
 export default function AccountDashboardPage() {
   const supabase = createClient();
   const { addToCart } = useCart();
+  const { items: wishlist, removeFromWishlist } = useWishlist();
 
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [greetingIdx, setGreetingIdx] = useState(0);
   const [activePolicyTab, setActivePolicyTab] = useState<'about' | 'shipping' | 'terms' | 'privacy'>('about');
-
-  // Interactive Wishlist
-  const [wishlist, setWishlist] = useState<any[]>([
-    {
-      id: '00000000-0000-0000-0000-000000000001',
-      title: 'Whole Round-Curled Dried Catfish (Big)',
-      slug: 'whole-round-curled-dried-catfish-big',
-      base_price: 9500,
-      price: 9500,
-      image: '/images/catfish-real-glass-plate.png',
-      is_digital: false,
-      tag: 'Most Popular',
-    },
-    {
-      id: '00000000-0000-0000-0000-000000000003',
-      title: 'Cut & Cleaned Dried Catfish Soup Pieces',
-      slug: 'cut-cleaned-dried-catfish-soup-pieces',
-      base_price: 8500,
-      price: 8500,
-      image: '/images/catfish-soup-pieces.png',
-      is_digital: false,
-      tag: 'Ready to Cook',
-    },
-    {
-      id: '00000000-0000-0000-0000-000000000006',
-      title: 'Boneless Dried Catfish Steaks (Oven-Dried)',
-      slug: 'boneless-dried-catfish-steaks',
-      base_price: 13500,
-      price: 13500,
-      image: '/images/catfish-steaks.png',
-      is_digital: false,
-      tag: 'Export Grade',
-    },
-  ]);
 
   useEffect(() => {
     async function getSession() {
@@ -99,7 +67,7 @@ export default function AccountDashboardPage() {
   };
 
   const handleRemoveWishlist = (id: string) => {
-    setWishlist((prev) => prev.filter((i) => i.id !== id));
+    removeFromWishlist(id);
   };
 
   const firstName =
