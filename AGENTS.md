@@ -385,45 +385,80 @@ Both must run on every non-API, non-static-asset request. The middleware is comp
 
 ---
 
-## Build Priority (HNG Task Requirements)
+## Mobile Application Architecture (React Native / Expo)
 
-### Must-Have (MVP)
-1. ✅ Product catalog + product detail pages
-2. ✅ Shopping cart (add, update, remove — persisted to Supabase)
-3. ✅ Checkout page with address form and payment
-4. ✅ Supabase database persistence (all data)
-5. ✅ Mailgun confirmation emails (order confirmation)
-6. ✅ Google Auth via Google Cloud Console (Supabase OAuth)
-7. ✅ Unit tests for all API endpoints
+### Core Objective
+A high-performance Android mobile application built with React Native / Expo sharing the exact same backend, database (Supabase PostgreSQL), authentication pool, and API endpoints as the Next.js web application (`shop.sawfywhite.com`).
 
-### Nice-to-Have (if time allows)
-- Blog with SEO content
-- Admin dashboard
-- Multi-language support
-- SEO landing pages
-- Framer Motion animations
-- Digital cookbook delivery
-- Order tracking
+### Essential Requirements
+1. **Shared Unified Authentication**:
+   - Users authenticate on both the website and mobile app using the **exact same account** (Supabase Auth).
+   - Logging in on mobile with an account created on the web provides immediate access to the user's profile and cart.
+2. **Instant Real-Time Bi-Directional Cart Synchronization**:
+   - **Web → Mobile**: When an authenticated user adds, updates, or removes an item on the web store, it instantly appears in their mobile app cart.
+   - **Mobile → Web**: When a user adds, updates, or removes an item in the mobile app, it instantly reflects in the web app cart.
+   - **Implementation**: Both platforms persist cart state to the shared Supabase `carts` and `cart_items` tables using identical schema and API endpoints (`/api/cart`). Real-time updates are driven by Supabase Realtime channels (`postgres_changes` on `cart_items`) with automatic refetch on app focus / route navigation.
+3. **Physical Phone Verification**:
+   - Must be installed and validated on a physical Android smartphone to confirm login, cart addition, and bi-directional real-time sync.
+
+---
+
+## Mobile App Submission Requirements (Mandatory Checklist)
+
+For final submission, the following three deliverables are required:
+
+1. **APK Download Link**:
+   - Compile a release Android APK (`app-release.apk`).
+   - Upload the APK to Google Drive (or an equivalent accessible file-sharing platform with public download permissions).
+   - Provide the direct download link.
+2. **Repository Link**:
+   - Public GitHub or Git repository link containing the full source code for the mobile application.
+3. **Video Demonstration (Continuous Single Take)**:
+   - Must be a **single continuous video recording** (no cuts or video splices) demonstrating cross-platform sync with the existing e-commerce store:
+     - **Step 1**: Open web application (`shop.sawfywhite.com`) and register/sign in with a new account. Show successful login state.
+     - **Step 2**: Add a dried catfish product to the cart on the web application. Show the item in the web cart.
+     - **Step 3**: Open the mobile application on a phone or screen. Log in to the mobile application using the exact same account credentials.
+     - **Step 4**: Show that the product added earlier from the website is visible in the mobile application's cart.
+     - **Step 5**: Add another dried catfish product to the cart from inside the mobile application.
+     - **Step 6**: Return to the web application and demonstrate that the product added from the mobile application is now also visible in the web application's cart.
+
+---
+
+## Build Priority
+
+### Completed (Web Storefront MVP)
+1. ✅ Product catalog + product detail pages (10 curated Abeokuta catfish selections)
+2. ✅ Shopping cart drawer with instant add, quantity adjustment, and clear
+3. ✅ Checkout page with dual payment routing (Paystack & Flutterwave)
+4. ✅ Supabase database persistence & SSR auth
+5. ✅ Mailgun transactional verification & confirmation emails
+6. ✅ Continuous 2K waterfall background with 3D streamlines, ripples, and leaping fish
+7. ✅ Multilingual cultural banners & proverbs (5 languages)
+8. ✅ Unit tests for all API endpoints
+
+### Active Phase: Mobile Application & Cross-Platform Sync
+1. 🟡 **Mobile App Scaffold**: Setup React Native / Expo application with shared Supabase client and Abeokuta brand styling.
+2. 🟡 **Unified Auth Screen**: Mobile Login & Signup matching web credentials (Supabase Auth).
+3. 🟡 **Shared Cart Engine**: Implement `/api/cart` and Supabase Realtime listener in mobile app and web app.
+4. 🟡 **Product Catalog Screen**: Render all 10 Abeokuta dried catfish products with size selector and "Add to Cart".
+5. 🟡 **Physical Device Testing**: Validate APK build and install on physical Android phone.
+6. 🟡 **E2E Sync Video Recording**: Record continuous single-take demonstration video following all 6 steps.
+7. 🟡 **APK Build & Release Distribution**: Generate APK, upload to Google Drive, and assemble final submission package.
 
 ---
 
 ## Commands Reference
 
 ```bash
-# Development
-npm run dev                    # Start dev server (localhost:3000)
-
-# Testing
-npm run test                   # Run Vitest unit/component tests
-npm run test:coverage          # Run tests with coverage report
-npm run test:e2e               # Run Playwright e2e tests
-
-# Build & Deploy
+# Web Storefront
+cd sawfy-white
+npm run dev                    # Start Next.js dev server (localhost:3000)
+npm run test                   # Run Vitest unit tests
 npm run build                  # Production build
-npm run start                  # Start production server locally
-npx vercel                     # Deploy to Vercel (preview)
-npx vercel --prod              # Deploy to Vercel (production)
 
-# Database
-npx supabase gen types typescript --project-id <ref> > types/database.ts  # Generate types from schema
+# Mobile Application (Expo / React Native)
+cd sawfy-white-mobile
+npx expo start                 # Start Expo dev server
+npx expo run:android           # Run on connected Android device / emulator
+npx eas build -p android --profile preview  # Build standalone APK
 ```
