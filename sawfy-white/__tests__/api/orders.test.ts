@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { POST } from '@/app/api/orders/route';
+import { POST, GET } from '@/app/api/orders/route';
 
 describe('Orders API Route', () => {
   it('rejects order with empty items array with 400', async () => {
@@ -61,4 +61,14 @@ describe('Orders API Route', () => {
     expect(body.shippingFee).toBe(0); // Zero shipping for digital
     expect(body.totalAmount).toBe(2500);
   }, 15000);
+
+  it('GET /api/orders rejects without userId or email', async () => {
+    const req = new Request('http://localhost:3000/api/orders', {
+      method: 'GET',
+    });
+    const res = await GET(req);
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toContain('userId or email');
+  });
 });

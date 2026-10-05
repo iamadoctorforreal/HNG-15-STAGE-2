@@ -65,7 +65,7 @@ export default async function HomePage({
                     <span className="text-xs text-gray-600 font-medium">Sand &amp; Grit Free</span>
                   </div>
                   <div>
-                    <span className="font-extrabold text-[#005230] block text-xl">1 Year</span>
+                    <span className="font-extrabold text-[#005230] block text-xl">6 Months</span>
                     <span className="text-xs text-gray-600 font-medium">Export Shelf Life</span>
                   </div>
                   <div>

@@ -23,23 +23,43 @@ export default function AccountDashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [greetingIdx, setGreetingIdx] = useState(0);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
   const [activePolicyTab, setActivePolicyTab] = useState<'about' | 'shipping' | 'terms' | 'privacy'>('about');
 
   useEffect(() => {
-    async function getSession() {
+    async function getSessionAndOrders() {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       setLoading(false);
-    }
-    getSession();
 
-    // Rotate greeting, stopping after 2 minutes
+      if (user) {
+        setOrdersLoading(true);
+        try {
+          const res = await fetch(`/api/orders?userId=${user.id}&email=${encodeURIComponent(user.email || '')}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.orders) {
+              setOrders(data.orders);
+            }
+          }
+        } catch (err) {
+          console.warn('Failed to load user orders:', err);
+        } finally {
+          setOrdersLoading(false);
+        }
+      }
+    }
+    getSessionAndOrders();
+
+    // Rotate greeting, stopping after 2 minutes on English
     const timer = setInterval(() => {
       setGreetingIdx((prev) => (prev + 1) % PROFILE_GREETINGS.length);
     }, 3500);
 
     const stopTimer = setTimeout(() => {
       clearInterval(timer);
+      setGreetingIdx(0); // Always stop on English
     }, 120000);
 
     return () => {
@@ -326,45 +346,108 @@ export default function AccountDashboardPage() {
 
       {/* 5. Order History */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200/80 shadow-md">
-        <h2 className="text-lg font-black text-gray-900 font-serif mb-4 pb-4 border-b border-gray-100">
-          📋 Order History
-        </h2>
-        <div className="space-y-4">
-          <div className="p-4 rounded-2xl border border-gray-200/80 bg-gray-50/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <strong className="text-xs text-gray-900">Order #SW-784019</strong>
-                <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                  Delivered ✓
-                </span>
-              </div>
-              <p className="text-xs text-gray-600">
-                2x Whole Round-Curled Dried Catfish (Big) • 1x Cookbook PDF
-              </p>
-              <span className="text-[11px] text-gray-400">Delivered on Oct 02, 2026</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-black text-gray-900">₦22,500</span>
-              <button
-                onClick={() => {
-                  addToCart({
-                    id: '00000000-0000-0000-0000-000000000001',
-                    title: 'Whole Round-Curled Dried Catfish (Big)',
-                    slug: 'whole-round-curled-dried-catfish-big',
-                    base_price: 9500,
-                    price: 9500,
-                    quantity: 2,
-                    image: '/images/catfish-real-glass-plate.png',
-                    is_digital: false,
-                  });
-                }}
-                className="px-4 py-2 rounded-xl bg-[#008751] hover:bg-[#006b3f] text-white text-xs font-bold transition-all cursor-pointer"
-              >
-                ⚡ Reorder
-              </button>
-            </div>
-          </div>
+        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+          <h2 className="text-lg font-black text-gray-900 font-serif">
+            📋 Order History
+          </h2>
+          <span className="text-xs text-gray-500 font-medium">
+            {orders.length} {orders.length === 1 ? 'order' : 'orders'} found (Web & Mobile)
+          </span>
         </div>
+
+        {ordersLoading ? (
+          <div className="py-8 text-center text-xs text-gray-400">Loading your order history...</div>
+        ) : orders.length > 0 ? (
+          <div className="space-y-4">
+            {orders.map((ord) => {
+              const itemsDesc = ord.order_items?.map((it: any) => `${it.quantity}x ${it.product_title}`).join(' • ') || 'Abeokuta Catfish Selection';
+              const createdDate = ord.created_at ? new Date(ord.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently placed';
+              const isPaid = ord.status === 'paid' || ord.status === 'delivered';
+              return (
+                <div key={ord.id} className="p-4 rounded-2xl border border-gray-200/80 bg-gray-50/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <strong className="text-xs text-gray-900">Order #{ord.id.slice(0, 8).toUpperCase()}</strong>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                        isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {ord.status?.toUpperCase() || 'PROCESSING'} {isPaid ? '✓' : '⏳'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600">
+                      {itemsDesc}
+                    </p>
+                    <span className="text-[11px] text-gray-400">Placed on {createdDate}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm font-black text-gray-900">
+                      {ord.currency === 'USD' ? '$' : '₦'}{Number(ord.total_amount).toLocaleString()}
+                    </span>
+                    <button
+                      onClick={() => {
+                        ord.order_items?.forEach((it: any) => {
+                          addToCart({
+                            id: it.product_id,
+                            title: it.product_title,
+                            slug: 'dried-catfish',
+                            base_price: it.unit_price,
+                            price: it.unit_price,
+                            quantity: it.quantity || 1,
+                            image: '/images/catfish-real-glass-plate.png',
+                            is_digital: !!it.is_digital,
+                          });
+                        });
+                      }}
+                      className="px-4 py-2 rounded-xl bg-[#008751] hover:bg-[#006b3f] text-white text-xs font-bold transition-all cursor-pointer"
+                    >
+                      ⚡ Reorder
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="p-4 rounded-2xl border border-gray-200/80 bg-gray-50/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <strong className="text-xs text-gray-900">Sample Order #SW-784019</strong>
+                  <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                    Delivered ✓
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600">
+                  2x Whole Round-Curled Dried Catfish (Big) • 1x Cookbook PDF
+                </p>
+                <span className="text-[11px] text-gray-400">Delivered on Oct 02, 2026</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-black text-gray-900">₦22,500</span>
+                <button
+                  onClick={() => {
+                    addToCart({
+                      id: '00000000-0000-0000-0000-000000000001',
+                      title: 'Whole Round-Curled Dried Catfish (Big)',
+                      slug: 'whole-round-curled-dried-catfish-big',
+                      base_price: 9500,
+                      price: 9500,
+                      quantity: 2,
+                      image: '/images/catfish-real-glass-plate.png',
+                      is_digital: false,
+                    });
+                  }}
+                  className="px-4 py-2 rounded-xl bg-[#008751] hover:bg-[#006b3f] text-white text-xs font-bold transition-all cursor-pointer"
+                >
+                  ⚡ Reorder
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 text-center pt-2">
+              Orders placed on mobile app or website with this account will automatically sync and display here in real time.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* 6. Company Heritage & Policies Section */}

@@ -125,3 +125,70 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error?.message || 'Order creation failed' }, { status: 500 });
   }
 }
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get('userId');
+    const email = searchParams.get('email');
+
+    if (!userId && !email) {
+      return NextResponse.json(
+        { error: 'userId or email parameter is required' },
+        { status: 400 }
+      );
+    }
+
+    let query = supabaseAdmin
+      .from('orders')
+      .select(`
+        id,
+        user_id,
+        guest_email,
+        guest_name,
+        status,
+        currency,
+        subtotal,
+        shipping_fee,
+        total_amount,
+        shipping_address,
+        metadata,
+        created_at,
+        order_items (
+          id,
+          product_id,
+          variant_id,
+          product_title,
+          variant_title,
+          unit_price,
+          quantity,
+          total_price,
+          is_digital
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (userId && email) {
+      query = query.or(`user_id.eq.${userId},guest_email.eq.${email}`);
+    } else if (userId) {
+      query = query.eq('user_id', userId);
+    } else if (email) {
+      query = query.eq('guest_email', email);
+    }
+
+    const { data: orders, error } = await query;
+
+    if (error) {
+      console.error('Failed to fetch orders from Supabase:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ orders: orders || [] });
+  } catch (err: any) {
+    console.error('Error in GET /api/orders:', err);
+    return NextResponse.json(
+      { error: err?.message || 'Failed to fetch order history' },
+      { status: 500 }
+    );
+  }
+}

@@ -68,7 +68,7 @@ export async function GET() {
 
     <div class="benefit">
       <h3>7. Pristine, Sand-Free Hygiene & Long Shelf Life</h3>
-      <p>Unlike ordinary market fish dried on open ground, Sawfy White catfish is raised in controlled Abeokuta ponds, cleaned with purified water, and packaged grit-free with a 90-day export shelf life.</p>
+      <p>Unlike ordinary market fish dried on open ground, Sawfy White catfish is raised in controlled Abeokuta ponds, cleaned with purified water, and packaged grit-free with a 6-month export shelf life.</p>
     </div>
 
     <div style="text-align:center;margin:30px 0;">

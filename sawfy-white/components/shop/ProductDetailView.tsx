@@ -148,7 +148,7 @@ export function ProductDetailView({ product, relatedProducts, locale }: ProductD
             </div>
             <div className="font-bold text-[#006b3f]">
               <span className="block text-base">🛡️</span>
-              90-Day Shelf Life
+              6-Month Shelf Life
               <span className="block text-[10px] text-gray-500 font-normal">Vacuum Sealed</span>
             </div>
             <div className="font-bold text-[#006b3f]">

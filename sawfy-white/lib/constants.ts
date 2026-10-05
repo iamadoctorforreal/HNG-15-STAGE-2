@@ -24,7 +24,7 @@ export const FALLBACK_PRODUCTS = [
     metadata: {
       origin: 'Abeokuta Fish Farms, Ogun State, Nigeria',
       pieces_per_kg: '4-6 large curled fish',
-      features: ['Curled circular shape (Eja Kika)', '100% sand-free', 'Intact heads & whiskers', '90-day shelf life'],
+      features: ['Curled circular shape (Eja Kika)', '100% sand-free', 'Intact heads & whiskers', '6-month shelf life'],
     },
     variants: [
       { id: '00000000-0000-0001-0000-000000000001', product_id: '00000000-0000-0000-0000-000000000001', title: '500g Pack (2-3 curled fish)', price: 9500, is_active: true },
