@@ -133,7 +133,7 @@ You are tasked with building a production-grade, mobile-first, SEO-rich cross-pl
    - `ProductsScreen.tsx`: Top search bar, category chips, 10 products with image view and quick add.
    - `CartScreen.tsx`: Live item listing, coupon discount, subtotal, and checkout modal.
    - `DashboardScreen.tsx`: Real-time order tracking, live order history, wishlist, daily deals, and WhatsApp customer care desk.
-5. Setup bottom navigation with 4 dedicated tabs: **`🏠 Home`**, **`🐟 Products`**, **`🛒 Cart`**, and **`👤 Dashboard`** / **`🔑 Sign In`**, with `Platform.OS === 'android'` bottom padding (58px).
+5. Wrap app in `<SafeAreaProvider>` and setup bottom navigation with 4 dedicated tabs: **`🏠 Home`**, **`🐟 Products`**, **`🛒 Cart`**, and **`👤 Dashboard`** / **`🔑 Sign In`**, with dynamic `useSafeAreaInsets()` hardware padding.
 
 ### Phase 4: Cloud APK Compilation with EAS
 1. In `app.json`, set `extra.eas.projectId` and ensure the `slug` strictly matches the registered Expo slug.

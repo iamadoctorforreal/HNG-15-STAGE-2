@@ -400,6 +400,20 @@ A high-performance Android mobile application built with React Native / Expo sha
    - **Implementation**: Both platforms persist cart state to the shared Supabase `carts` and `cart_items` tables using identical schema and API endpoints (`/api/cart`). Real-time updates are driven by Supabase Realtime channels (`postgres_changes` on `cart_items`) with automatic refetch on app focus / route navigation.
 3. **Physical Phone Verification**:
    - Must be installed and validated on a physical Android smartphone to confirm login, cart addition, and bi-directional real-time sync.
+4. **Hardware Window Insets & Navigation Bar Best Practice (`react-native-safe-area-context`)**:
+   - **Never rely on React Native's core `SafeAreaView` on Android**: In core React Native, `SafeAreaView` is a no-op `<View>` on Android and completely ignores the software navigation bar (Back ◀, Home ⚪, Recents ◼) and camera cutouts.
+   - **Root Context Wrapper**: Always wrap the entire mobile application in `<SafeAreaProvider>` from `react-native-safe-area-context` at the root in `App.tsx`.
+   - **Dynamic Inset Consumption**: Consume `const insets = useSafeAreaInsets()` to read Android's native `WindowInsetsCompat` directly from the OS in real-time.
+   - **Bottom Tab Navigation Clearance**:
+     ```typescript
+     const insets = useSafeAreaInsets();
+     const bottomInset = insets.bottom > 0
+       ? insets.bottom + 6
+       : (Platform.OS === 'android' ? 56 : 10);
+     ```
+     Apply `paddingBottom: bottomInset` dynamically on the tab bar container. This natively adapts to 3-button navigation (48–56dp), gesture navigation (16–24dp), and future Android Edge-to-Edge display modes with zero pixel guesswork.
+   - **Top Header Notch Clearance**: Apply `paddingTop: Math.max(insets.top, 24) + 10` on headers to clear camera punch-holes and status bars.
+   - **Android Navigation Bar Config**: In `app.json`, set `"androidNavigationBar": { "visible": "always", "backgroundColor": "#FFFFFF", "barStyle": "dark-content" }`.
 
 ---
 
