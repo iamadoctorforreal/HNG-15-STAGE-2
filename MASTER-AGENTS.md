@@ -76,9 +76,18 @@ You are tasked with building a production-grade, mobile-first, SEO-rich cross-pl
 * Implement `app/robots.ts` granting crawler access.
 
 ### Pattern 7: Android System Navigation Bar Inset & Edge-to-Edge Avoidance
-* **The Problem**: On Android devices with physical or software 3-button navigation (Back ◀, Home ⚪, Recents ◼), the system renders the button bar as an overlay on top of React Native screens. Standard `SafeAreaView` does not add bottom insets for soft navigation keys on Android, causing bottom tab bars (`Home`, `Products`, `Cart`, `Dashboard`) to render behind the system buttons and become unclickable.
-* **The Dual Fix**:
-  1. In `app.json`, explicitly configure the Android navigation bar:
+* **The Problem**: On Android devices with physical or software 3-button navigation (Back ◀, Home ⚪, Recents ◼), the system renders the button bar as an overlay on top of React Native screens. Standard `SafeAreaView` from React Native core does **not** add bottom insets for soft navigation keys on Android (it is a no-op on Android), causing bottom tab bars (`Home`, `Products`, `Cart`, `Dashboard`) to render behind the system buttons and become unclickable.
+* **The Definitive Fix**: Use `react-native-safe-area-context`:
+  1. Wrap the root component in `<SafeAreaProvider>` from `react-native-safe-area-context`.
+  2. Use the `useSafeAreaInsets()` hook to query dynamic hardware window insets (`WindowInsetsCompat` on Android):
+     ```typescript
+     const insets = useSafeAreaInsets();
+     const bottomInset = insets.bottom > 0
+       ? insets.bottom + 6
+       : (Platform.OS === 'android' ? 56 : 10);
+     ```
+  3. Apply `paddingBottom: bottomInset` dynamically on the bottom tab bar container `<View>`.
+  4. In `app.json`, set:
      ```json
      "androidNavigationBar": {
        "visible": "always",
@@ -86,20 +95,7 @@ You are tasked with building a production-grade, mobile-first, SEO-rich cross-pl
        "barStyle": "dark-content"
      }
      ```
-  2. In your root `tabBarContainer` styling (in `App.tsx` or navigation shell):
-     ```typescript
-     tabBarContainer: {
-       flexDirection: 'row',
-       backgroundColor: '#FFFFFF',
-       borderTopWidth: 1,
-       borderTopColor: '#E2E8F0',
-       paddingTop: 8,
-       paddingBottom: Platform.OS === 'android' ? 58 : 10,
-       minHeight: Platform.OS === 'android' ? 76 : 58,
-       // ...
-     }
-     ```
-  *This guarantees the interactive tabs always float cleanly above the Android system buttons on every physical phone model.*
+  *This dynamically adapts to 3-button navigation (48-56dp), gesture navigation (16-24dp), and notch/status bar cutouts without guesswork.*
 
 ### Pattern 8: 4-Tab Dedicated Mobile Layout & Above-The-Fold Search
 * **Mobile Tab Structure**: Provide a dedicated 4-tab bottom navigation:
